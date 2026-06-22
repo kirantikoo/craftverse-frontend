@@ -1,26 +1,105 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #172033;
+  --card: rgba(255, 255, 255, 0.72);
+  --card-foreground: #172033;
+  --popover: #ffffff;
+  --popover-foreground: #172033;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2ff;
+  --secondary-foreground: #172033;
+  --muted: #eef2f7;
+  --muted-foreground: #64748b;
+  --accent: #e0f2fe;
+  --accent-foreground: #172033;
+  --border: #dbe4f0;
+  --input: #e8edf5;
+  --ring: #8b5cf6;
+  --destructive: #e11d48;
+}
+
+.dark {
+  --background: #050816;
+  --foreground: #f8fafc;
+  --card: rgba(15, 23, 42, 0.68);
+  --card-foreground: #f8fafc;
+  --popover: #10182d;
+  --popover-foreground: #f8fafc;
+  --primary: #a78bfa;
+  --primary-foreground: #ffffff;
+  --secondary: #17213b;
+  --secondary-foreground: #f8fafc;
+  --muted: #17213b;
+  --muted-foreground: #a8b4cc;
+  --accent: #1f3154;
+  --accent-foreground: #f8fafc;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #22d3ee;
+  --destructive: #fb7185;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  min-height: 100%;
+  max-width: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+*,
+*::before,
+*::after {
+  border-color: var(--border);
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
 }
