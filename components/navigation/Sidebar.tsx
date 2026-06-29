@@ -39,7 +39,7 @@ export default function Sidebar() {
         <nav className="space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href;
+            const active = item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <Link
@@ -86,9 +86,9 @@ export default function Sidebar() {
           <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">
             Unlock premium tutorials, materials & more.
           </p>
-          <button className="mt-5 w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 py-3 font-bold text-white shadow-lg">
+          <Link href="/upgrade" className="mt-5 block w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 py-3 text-center font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:brightness-110">
             Upgrade Now →
-          </button>
+          </Link>
         </div>
       </div>
     </aside>

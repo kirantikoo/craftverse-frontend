@@ -50,7 +50,7 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
           <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const active = pathname === item.href;
+              const active = item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
                 <Link
@@ -79,7 +79,7 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
             <p className="text-2xl">👑</p>
             <h3 className="mt-2 text-lg font-black text-purple-800 dark:text-yellow-300">Upgrade to Pro</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">Unlock premium tutorials, materials & more.</p>
-            <button className="mt-5 h-12 w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 font-bold text-white shadow-lg">Upgrade Now →</button>
+            <Link href="/upgrade" onClick={() => onOpenChange(false)} className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 font-bold text-white shadow-lg">Upgrade Now →</Link>
           </div>
         </div>
       </SheetContent>

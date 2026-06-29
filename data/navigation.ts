@@ -8,18 +8,26 @@ import {
     Bot,
     LayoutDashboard,
     User,
+    Bell,
+    Settings,
   } from "lucide-react";
   
   export const navItems = [
     { name: "Home", href: "/", icon: Home, iconClass: "text-cyan-500 dark:text-cyan-300" },
     { name: "Learn", href: "/learn", icon: BookOpen, iconClass: "text-violet-500 dark:text-violet-300" },
     { name: "Explore", href: "/explore", icon: Compass, iconClass: "text-fuchsia-500 dark:text-fuchsia-300" },
+    { name: "Tutorials", href: "/tutorials", icon: BookOpen, iconClass: "text-cyan-500 dark:text-cyan-300" },
     { name: "Create", href: "/create", icon: PlusCircle, iconClass: "text-sky-500 dark:text-sky-300" },
+    { name: "Projects", href: "/projects", icon: PlusCircle, iconClass: "text-emerald-500 dark:text-emerald-300" },
+    { name: "Collections", href: "/collections", icon: Compass, iconClass: "text-pink-500 dark:text-pink-300" },
     { name: "Shop", href: "/shop", icon: ShoppingBag, iconClass: "text-purple-500 dark:text-purple-300" },
     { name: "Community", href: "/community", icon: Users, iconClass: "text-pink-500 dark:text-pink-300" },
     { name: "AI Tutor", href: "/ai-tutor", icon: Bot, iconClass: "text-violet-500 dark:text-violet-300" },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, iconClass: "text-cyan-500 dark:text-cyan-300" },
+    { name: "Notifications", href: "/notifications", icon: Bell, iconClass: "text-rose-500 dark:text-rose-300" },
     { name: "Profile", href: "/profile", icon: User, iconClass: "text-purple-500 dark:text-purple-300" },
+    { name: "Settings", href: "/settings", icon: Settings, iconClass: "text-slate-500 dark:text-slate-300" },
+    { name: "Admin", href: "/admin", icon: LayoutDashboard, iconClass: "text-amber-500 dark:text-amber-300" },
   ];
   
   export const bottomNavItems = [

@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 type StatActionCardProps = {
@@ -7,6 +8,7 @@ type StatActionCardProps = {
   title: string;
   description: string;
   action: string;
+  href: string;
   accent: string;
   children?: ReactNode;
 };
@@ -17,6 +19,7 @@ export default function StatActionCard({
   title,
   description,
   action,
+  href,
   accent,
   children,
 }: StatActionCardProps) {
@@ -40,10 +43,10 @@ export default function StatActionCard({
       {children && <div className="pt-5">{children}</div>}
 
       <div className="mt-auto pt-5">
-        <button className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/65 text-sm font-bold text-slate-900 transition hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15">
+        <Link href={href} className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/65 text-sm font-bold text-slate-900 transition hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15">
           {action}
           <ArrowRight size={17} />
-        </button>
+        </Link>
       </div>
     </article>
   );

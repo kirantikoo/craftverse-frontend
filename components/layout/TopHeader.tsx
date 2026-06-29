@@ -2,6 +2,7 @@
 
 import { Bell, ChevronDown, Menu, Search } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import MobileDrawer from "@/components/navigation/MobileDrawer";
@@ -47,14 +48,14 @@ export default function TopHeader() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
-          <button aria-label="Notifications" className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-400/60 hover:shadow-lg dark:border-white/10 dark:bg-white/10 dark:text-white">
+          <Link href="/notifications" aria-label="Notifications" className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-400/60 hover:shadow-lg dark:border-white/10 dark:bg-white/10 dark:text-white">
             <Bell size={18} />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-pink-500 ring-2 ring-card" />
-          </button>
-          <button aria-label="Open profile menu" className="hidden items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 p-1.5 pr-3 shadow-sm transition hover:border-cyan-400/60 dark:border-white/10 dark:bg-white/10 sm:flex">
+          </Link>
+          <Link href="/profile" aria-label="Open profile" className="hidden items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 p-1.5 pr-3 shadow-sm transition hover:border-cyan-400/60 dark:border-white/10 dark:bg-white/10 sm:flex">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 text-base">🧶</span>
             <ChevronDown size={16} className="text-muted-foreground" />
-          </button>
+          </Link>
         </div>
       </div>
       <MobileDrawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />

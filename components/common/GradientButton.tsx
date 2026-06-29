@@ -1,10 +1,15 @@
+import Link from "next/link";
+
 export default function GradientButton({
     text,
+    href,
   }: {
     text: string;
+    href: string;
   }) {
     return (
-      <button
+      <Link
+        href={href}
         className="
         rounded-full
         px-6
@@ -21,6 +26,6 @@ export default function GradientButton({
         "
       >
         {text}
-      </button>
+      </Link>
     );
   }
