@@ -29,7 +29,7 @@ export default function TutorialCard({ tutorial }: { tutorial: Tutorial }) {
           <Trophy size={16} className="text-[#7C4DFF]" />
           {tutorial.xp} XP
         </span>
-        <span className="inline-flex h-11 items-center gap-2 rounded-2xl bg-[#FFF8F3] px-4 text-sm font-black text-slate-900 transition group-hover:bg-white dark:bg-white/10 dark:text-white">
+        <span className="inline-flex h-11 items-center gap-2 rounded-2xl bg-[#FFF8F3] px-4 text-sm font-black text-slate-900 transition group-hover:bg-white dark:bg-white/10 dark:text-white dark:group-hover:bg-[#FFF8F3] dark:group-hover:text-slate-950">
           Open Tutorial
           <ArrowRight size={16} />
         </span>
