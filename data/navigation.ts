@@ -10,6 +10,7 @@ import {
     User,
     Bell,
     Settings,
+    BadgeDollarSign,
   } from "lucide-react";
   
   export const navItems = [
@@ -23,7 +24,8 @@ import {
     { name: "Shop", href: "/shop", icon: ShoppingBag, iconClass: "text-purple-500 dark:text-purple-300" },
     { name: "Community", href: "/community", icon: Users, iconClass: "text-pink-500 dark:text-pink-300" },
     { name: "AI Tutor", href: "/ai-tutor", icon: Bot, iconClass: "text-violet-500 dark:text-violet-300" },
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, iconClass: "text-cyan-500 dark:text-cyan-300" },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, iconClass: "text-cyan-500 dark:text-cyan-300", requiresAuth: true },
+    { name: "Pricing", href: "/pricing", icon: BadgeDollarSign, iconClass: "text-emerald-500 dark:text-emerald-300" },
     { name: "Notifications", href: "/notifications", icon: Bell, iconClass: "text-rose-500 dark:text-rose-300" },
     { name: "Profile", href: "/profile", icon: User, iconClass: "text-purple-500 dark:text-purple-300" },
     { name: "Settings", href: "/settings", icon: Settings, iconClass: "text-slate-500 dark:text-slate-300" },

@@ -3,11 +3,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LogIn } from "lucide-react";
 import { navItems } from "@/data/navigation";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { displayName, isLoggedIn, loading } = useAuth();
+  const visibleNavItems = navItems.filter((item) => !item.requiresAuth || isLoggedIn);
+  const avatarInitial = displayName.charAt(0).toUpperCase() || "C";
 
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[272px] overflow-hidden border-r border-slate-200 bg-white/90 p-5 shadow-[0_0_60px_rgba(14,165,233,0.10)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#071020]/95 lg:flex lg:flex-col">
@@ -37,7 +41,7 @@ export default function Sidebar() {
 
       <div className="relative flex-1 overflow-y-auto pr-1">
         <nav className="space-y-2">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const active = item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -77,6 +81,31 @@ export default function Sidebar() {
           })}
         </nav>
 
+        {!loading ? (
+          <div className="mt-7 rounded-3xl border border-[#008099]/15 bg-white/85 p-4 shadow-lg dark:border-white/10 dark:bg-white/[0.06]">
+            {isLoggedIn ? (
+              <Link href="/profile" className="flex min-w-0 items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
+                  {avatarInitial}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-black text-slate-900 dark:text-white">
+                    {displayName}
+                  </span>
+                  <span className="block text-xs font-semibold text-slate-500 dark:text-slate-300">
+                    CraftVerse creator
+                  </span>
+                </span>
+              </Link>
+            ) : (
+              <Link href="/login" className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#008099] px-4 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#006f85]">
+                <LogIn size={17} />
+                Login
+              </Link>
+            )}
+          </div>
+        ) : null}
+
         <div className="mt-7 overflow-hidden rounded-3xl border border-purple-200 bg-gradient-to-br from-violet-100 via-white to-pink-100 p-5 shadow-lg dark:border-purple-400/30 dark:bg-gradient-to-br dark:from-purple-950/80 dark:via-[#10183a] dark:to-pink-950/70 dark:shadow-xl">
           <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-pink-400/25 blur-3xl dark:bg-pink-500/30" />
           <p className="text-2xl">👑</p>
@@ -86,7 +115,7 @@ export default function Sidebar() {
           <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">
             Unlock premium tutorials, materials & more.
           </p>
-          <Link href="/upgrade" className="mt-5 block w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 py-3 text-center font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:brightness-110">
+          <Link href="/pricing" className="mt-5 block w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 py-3 text-center font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:brightness-110">
             Upgrade Now →
           </Link>
         </div>
