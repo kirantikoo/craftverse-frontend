@@ -13,5 +13,5 @@ export function getUserDisplayName(user: User | null) {
     return user.email.split("@")[0];
   }
 
-  return "Creator";
+  return "CraftVerse member";
 }

@@ -28,7 +28,7 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="left"
-        className="w-[82vw] max-w-[320px] border-slate-200 bg-white p-5 text-slate-900 dark:border-white/10 dark:bg-[#071020] dark:text-white"
+        className="w-[82vw] max-w-[320px] border-slate-200 bg-white p-5 text-slate-900 dark:border-white/10 dark:bg-[#071020]/95 dark:text-white"
       >
         <SheetTitle className="sr-only">CraftVerse navigation</SheetTitle>
         <SheetDescription className="sr-only">Navigate CraftVerse</SheetDescription>
@@ -52,7 +52,7 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
           </Link>
 
           {!loading ? (
-            <div className="mb-5 rounded-3xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-white/[0.06]">
+            <div className="mb-5 rounded-3xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-[#0f1b2f]/75">
               {isLoggedIn ? (
                 <Link href="/profile" onClick={() => onOpenChange(false)} className="flex min-w-0 items-center gap-3">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
@@ -76,7 +76,7 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
             </div>
           ) : null}
 
-          <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
+          <nav className="craft-scrollbar flex-1 space-y-2 overflow-y-auto pr-1">
             {visibleNavItems.map((item) => {
               const Icon = item.icon;
               const active = item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -88,12 +88,12 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
                   onClick={() => onOpenChange(false)}
                   className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition ${
                     active
-                      ? "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white shadow-[0_10px_30px_rgba(236,72,153,0.35)]"
-                      : "border border-slate-200 bg-white/80 text-slate-900 shadow-sm hover:border-cyan-400/60 hover:bg-cyan-50/70 dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.10]"
+                      ? "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white shadow-[0_10px_30px_rgba(236,72,153,0.35)] dark:shadow-[0_12px_34px_rgba(34,211,238,0.22)]"
+                      : "border border-slate-200 bg-white/80 text-slate-900 shadow-sm hover:border-cyan-400/60 hover:bg-cyan-50/70 dark:border-white/10 dark:bg-[#0f1b2f]/75 dark:text-slate-100 dark:hover:border-cyan-300/35 dark:hover:bg-[#17243c]"
                   }`}
                 >
                   <span className="flex items-center gap-3">
-                    <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${active ? "bg-white/20 text-white" : `bg-slate-100 ${item.iconClass} dark:bg-white/10`}`}>
+                    <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${active ? "bg-white/20 text-white" : `bg-slate-100 ${item.iconClass} dark:bg-white/10 dark:text-cyan-100`}`}>
                       <Icon size={20} />
                     </span>
                     {item.name}

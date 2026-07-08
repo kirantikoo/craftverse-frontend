@@ -78,12 +78,12 @@ export default function PricingPage() {
         : "Detecting your region...";
 
   return (
-    <section className="rounded-[2rem] border border-slate-200 bg-gradient-to-br from-[#FFF8F3] via-white to-[#EFFFF0] px-4 py-6 text-slate-950 shadow-[0_22px_70px_rgba(0,128,153,0.12)] sm:px-6 sm:py-8 lg:px-8 dark:border-slate-700 dark:bg-[#050816] dark:bg-none dark:text-slate-100">
+    <section className="craft-dark-panel rounded-[2rem] border border-slate-200 bg-gradient-to-br from-[#FFF8F3] via-white to-[#EFFFF0] px-4 py-6 text-slate-950 shadow-[0_22px_70px_rgba(0,128,153,0.12)] sm:px-6 sm:py-8 lg:px-8 dark:border-white/10 dark:bg-none dark:text-slate-100 dark:shadow-[0_24px_80px_rgba(0,0,0,0.30)]">
       <div className="mx-auto max-w-[1100px]">
-        <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6 dark:border-slate-700 dark:bg-[#0B1220] dark:shadow-none">
+        <div className="craft-dark-card rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6 dark:border-white/10">
           <div className="grid gap-5 lg:grid-cols-[1fr_310px] lg:items-center">
             <div>
-              <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#008099]/15 bg-[#FFF8F3] px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[#008099] shadow-sm dark:border-[#4EFE32]/25 dark:bg-[#111827] dark:text-[#4EFE32]">
+              <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#008099]/15 bg-[#FFF8F3] px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[#008099] shadow-sm dark:border-[#4EFE32]/25 dark:bg-[#4EFE32]/10 dark:text-[#4EFE32]">
                 <Sparkles size={14} />
                 CraftVerse plans
               </p>
@@ -95,14 +95,14 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <label className="block rounded-2xl border border-slate-200 bg-[#FFF8F3]/80 p-4 shadow-sm dark:border-slate-700 dark:bg-[#111827]">
+            <label className="block rounded-2xl border border-slate-200 bg-[#FFF8F3]/80 p-4 shadow-sm dark:border-white/10 dark:bg-[#0f1b2f]">
               <span className="mb-2 block text-sm font-black text-slate-900 dark:text-slate-100">
                 Choose your region
               </span>
               <select
                 value={selectedCountry}
                 onChange={(event) => handleRegionChange(event.target.value)}
-                className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 shadow-sm outline-none transition hover:border-[#008099]/50 focus:border-[#008099] focus:ring-4 focus:ring-[#008099]/15 dark:border-slate-700 dark:bg-[#0B1220] dark:text-white dark:hover:border-[#4EFE32]/60"
+                className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 shadow-sm outline-none transition hover:border-[#008099]/50 focus:border-[#008099] focus:ring-4 focus:ring-[#008099]/15 dark:border-white/10 dark:bg-[#071020] dark:text-white dark:hover:border-[#4EFE32]/60 dark:focus:ring-[#4EFE32]/15"
               >
                 {countryOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -118,7 +118,7 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-6 grid items-stretch gap-5 md:grid-cols-2">
-          <article className="flex min-h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 text-slate-950 shadow-[0_20px_60px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-[#0B1220] dark:text-slate-100 dark:shadow-none">
+          <article className="craft-dark-card flex min-h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 text-slate-950 shadow-[0_20px_60px_rgba(15,23,42,0.08)] dark:border-white/10 dark:text-slate-100">
             <div>
               <span className="inline-flex rounded-full border border-[#008099]/15 bg-[#008099]/8 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[#008099] dark:border-[#4EFE32]/25 dark:bg-[#4EFE32]/10 dark:text-[#4EFE32]">
                 15-day trial
@@ -147,14 +147,14 @@ export default function PricingPage() {
 
             <Link
               href="/login"
-              className="mt-auto flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#008099]/25 bg-white px-5 text-center text-base font-black text-[#008099] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#008099] hover:text-white hover:shadow-lg dark:border-slate-600 dark:bg-[#111827] dark:text-slate-100 dark:hover:border-[#4EFE32] dark:hover:bg-[#4EFE32] dark:hover:text-slate-950"
+              className="mt-auto flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#008099]/25 bg-white px-5 text-center text-base font-black text-[#008099] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#008099] hover:text-white hover:shadow-lg dark:border-white/10 dark:bg-[#13223a] dark:text-white dark:hover:border-[#4EFE32] dark:hover:bg-[#4EFE32] dark:hover:text-slate-950"
             >
               Start learning
               <ChevronRight size={18} />
             </Link>
           </article>
 
-          <article className="relative flex min-h-full flex-col overflow-hidden rounded-3xl border border-[#7C4DFF]/35 bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#111827] p-6 text-white shadow-[0_24px_70px_rgba(124,77,255,0.28)] dark:border-slate-700 dark:shadow-none">
+          <article className="relative flex min-h-full flex-col overflow-hidden rounded-3xl border border-[#7C4DFF]/35 bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#111827] p-6 text-white shadow-[0_24px_70px_rgba(124,77,255,0.28)] dark:border-white/10 dark:from-[#06364a] dark:via-[#22174d] dark:to-[#071020] dark:shadow-[0_24px_70px_rgba(0,0,0,0.30)]">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/35" />
             <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 left-8 h-52 w-52 rounded-full bg-[#4EFE32]/10 blur-3xl" />

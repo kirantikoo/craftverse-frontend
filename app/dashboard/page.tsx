@@ -10,14 +10,14 @@ import { auth } from "@/src/lib/firebase";
 import { getDaysLeft } from "@/src/lib/subscription";
 
 function DashboardContent() {
-  const { displayName, user, userProfile } = useAuth();
+  const { displayName, profileError, user, userProfile } = useAuth();
   const daysLeft = getDaysLeft(userProfile?.trialEndsAt);
 
   return (
-    <section className="min-h-[70vh] rounded-[2rem] border border-[#008099]/15 bg-[#FFF8F3] p-5 shadow-[0_22px_70px_rgba(0,128,153,0.14)] sm:p-8 dark:border-white/10 dark:bg-white/10">
+    <section className="craft-dark-panel min-h-[70vh] rounded-[2rem] border border-[#008099]/15 bg-[#FFF8F3] p-5 shadow-[0_22px_70px_rgba(0,128,153,0.14)] sm:p-8 dark:border-white/10 dark:shadow-[0_24px_80px_rgba(0,0,0,0.30)]">
       <div className="mx-auto flex max-w-4xl flex-col gap-6">
-        <div className="rounded-3xl bg-white/85 p-6 shadow-xl dark:bg-[#08111f]/80 sm:p-8">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#4EFE32]/40 bg-[#4EFE32]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[#008099]">
+        <div className="craft-dark-card rounded-3xl bg-white/85 p-6 shadow-xl sm:p-8 dark:border dark:border-white/10">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#4EFE32]/40 bg-[#4EFE32]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[#008099] dark:text-[#4EFE32]">
             <Sparkles size={14} />
             Creator dashboard
           </p>
@@ -28,19 +28,25 @@ function DashboardContent() {
             You are signed in and ready to keep learning, creating, sharing, and selling.
           </p>
 
-          <div className="mt-8 rounded-2xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-white/10">
+          {profileError ? (
+            <p className="mt-5 rounded-2xl border border-amber-300/70 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800 dark:border-amber-300/30 dark:bg-amber-400/10 dark:text-amber-100">
+              {profileError}
+            </p>
+          ) : null}
+
+          <div className="mt-8 rounded-2xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-[#0f1b2f]">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
               Signed in as
             </p>
-            <p className="mt-2 break-all text-lg font-black text-[#008099]">
-              {user?.email ?? "CraftVerse creator"}
+            <p className="mt-2 break-all text-lg font-black text-[#008099] dark:text-cyan-200">
+              {user?.email ?? displayName}
             </p>
           </div>
 
-          <div className="mt-5 rounded-3xl border border-[#4EFE32]/35 bg-[linear-gradient(135deg,rgba(78,254,50,0.16),rgba(255,248,243,0.96)_48%,rgba(124,77,255,0.14))] p-5 dark:border-[#4EFE32]/25 dark:bg-white/10">
+          <div className="mt-5 rounded-3xl border border-[#4EFE32]/35 bg-[linear-gradient(135deg,rgba(78,254,50,0.16),rgba(255,248,243,0.96)_48%,rgba(124,77,255,0.14))] p-5 dark:border-[#4EFE32]/25 dark:bg-[linear-gradient(135deg,rgba(78,254,50,0.12),rgba(15,23,42,0.96)_44%,rgba(124,77,255,0.18))]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-[#008099]">
+                <p className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-[#008099] dark:text-[#4EFE32]">
                   <Crown size={17} />
                   Premium trial
                 </p>
@@ -55,7 +61,7 @@ function DashboardContent() {
                 <Link href="/pricing">Upgrade to Premium</Link>
               </Button>
             </div>
-            <p className="mt-4 text-sm font-black text-[#7C4DFF]">
+            <p className="mt-4 text-sm font-black text-[#7C4DFF] dark:text-violet-200">
               Premium price: $5/month
             </p>
           </div>

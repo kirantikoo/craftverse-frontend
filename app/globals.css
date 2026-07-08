@@ -79,6 +79,50 @@ body {
   transition: background-color 180ms ease, color 180ms ease;
 }
 
+.craft-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.craft-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.craft-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.craft-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.dark .craft-scrollbar {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.dark .craft-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.dark .craft-dark-panel {
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.14), transparent 30%),
+    linear-gradient(135deg, rgba(7, 16, 32, 0.96), rgba(15, 23, 42, 0.94) 48%, rgba(30, 22, 56, 0.94));
+}
+
+.dark .craft-dark-card {
+  background: rgba(15, 23, 42, 0.78);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+}
+
+.dark .craft-dark-premium {
+  background:
+    radial-gradient(circle at 12% 14%, rgba(78, 254, 50, 0.2), transparent 28%),
+    radial-gradient(circle at 90% 10%, rgba(124, 77, 255, 0.3), transparent 30%),
+    linear-gradient(135deg, #082335, #111a34 44%, #211438);
+}
+
 *,
 *::before,
 *::after {

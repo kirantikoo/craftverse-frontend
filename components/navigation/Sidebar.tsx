@@ -14,7 +14,7 @@ export default function Sidebar() {
   const avatarInitial = displayName.charAt(0).toUpperCase() || "C";
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[272px] overflow-hidden border-r border-slate-200 bg-white/90 p-5 shadow-[0_0_60px_rgba(14,165,233,0.10)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#071020]/95 lg:flex lg:flex-col">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[272px] overflow-hidden border-r border-slate-200 bg-white/90 p-5 shadow-[0_0_60px_rgba(14,165,233,0.10)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#071020]/90 dark:shadow-[0_0_70px_rgba(0,0,0,0.35)] lg:flex lg:flex-col">
       <div className="pointer-events-none absolute -left-20 top-10 h-60 w-60 rounded-full bg-cyan-500/20 blur-[100px]" />
       <div className="pointer-events-none absolute -right-20 bottom-20 h-60 w-60 rounded-full bg-purple-500/20 blur-[100px]" />
 
@@ -39,7 +39,7 @@ export default function Sidebar() {
         </div>
       </Link>
 
-      <div className="relative flex-1 overflow-y-auto pr-1">
+      <div className="craft-scrollbar relative flex-1 overflow-y-auto pr-1">
         <nav className="space-y-2">
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
@@ -51,8 +51,8 @@ export default function Sidebar() {
                 href={item.href}
                 className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-bold transition-all duration-300 ${
                   active
-                    ? "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white shadow-[0_10px_30px_rgba(236,72,153,0.35)]"
-                    : "border border-slate-200 bg-white/80 text-slate-900 shadow-sm hover:-translate-y-0.5 hover:border-cyan-400/60 hover:bg-cyan-50/70 hover:shadow-md dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.10]"
+                    ? "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white shadow-[0_10px_30px_rgba(236,72,153,0.35)] dark:shadow-[0_12px_34px_rgba(34,211,238,0.22)]"
+                    : "border border-slate-200 bg-white/80 text-slate-900 shadow-sm hover:-translate-y-0.5 hover:border-cyan-400/60 hover:bg-cyan-50/70 hover:shadow-md dark:border-white/10 dark:bg-[#0f1b2f]/75 dark:text-slate-100 dark:hover:border-cyan-300/35 dark:hover:bg-[#17243c]"
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -60,7 +60,7 @@ export default function Sidebar() {
                     className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
                       active
                         ? "bg-white/20"
-                        : `bg-slate-100 ${item.iconClass} group-hover:bg-gradient-to-br group-hover:from-cyan-500 group-hover:to-purple-500 group-hover:text-white dark:bg-white/10`
+                        : `bg-slate-100 ${item.iconClass} group-hover:bg-gradient-to-br group-hover:from-cyan-500 group-hover:to-purple-500 group-hover:text-white dark:bg-white/10 dark:text-cyan-100`
                     }`}
                   >
                     <Icon size={20} />
@@ -82,7 +82,7 @@ export default function Sidebar() {
         </nav>
 
         {!loading ? (
-          <div className="mt-7 rounded-3xl border border-[#008099]/15 bg-white/85 p-4 shadow-lg dark:border-white/10 dark:bg-white/[0.06]">
+          <div className="mt-7 rounded-3xl border border-[#008099]/15 bg-white/85 p-4 shadow-lg dark:border-white/10 dark:bg-[#0f1b2f]/75">
             {isLoggedIn ? (
               <Link href="/profile" className="flex min-w-0 items-center gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
