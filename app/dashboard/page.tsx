@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import UserAvatar from "@/components/common/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/src/context/AuthContext";
 import { getDaysLeft } from "@/src/lib/subscription";
@@ -65,7 +66,7 @@ function SectionLabel({ icon: Icon, children }: { icon: LucideIcon; children: Re
 }
 
 function DashboardContent() {
-  const { displayName, profileError, userProfile } = useAuth();
+  const { displayName, profileError, user, userProfile } = useAuth();
   const daysLeft = getDaysLeft(userProfile?.trialEndsAt);
   const planLabel = userProfile?.plan === "premium" ? "Premium" : "Trial";
   const shownDaysLeft = daysLeft || 12;
@@ -93,16 +94,24 @@ function DashboardContent() {
 
         <div className="grid gap-6 xl:grid-cols-[1.55fr_0.85fr]">
           <GlassCard className="overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(78,254,50,0.10),rgba(124,77,255,0.12))] dark:bg-[linear-gradient(135deg,rgba(17,24,39,0.92),rgba(0,128,153,0.16),rgba(124,77,255,0.18))]">
-            <div className="max-w-3xl">
-              <p className="text-sm font-bold text-[#008099] dark:text-[#4EFE32]">
-                Welcome back,
-              </p>
-              <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl">
-                {displayName || "Maker"} <span aria-hidden="true">👋</span>
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-7 text-slate-600 dark:text-[#94A3B8]">
-                Ready to continue creating today?
-              </p>
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+              <UserAvatar
+                user={user}
+                userProfile={userProfile}
+                className="h-20 w-20 shrink-0 rounded-3xl object-cover shadow-xl"
+                fallbackClassName="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-3xl font-black text-white shadow-xl"
+              />
+              <div className="max-w-3xl">
+                <p className="text-sm font-bold text-[#008099] dark:text-[#4EFE32]">
+                  Welcome back,
+                </p>
+                <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl">
+                  {displayName || "Maker"} <span aria-hidden="true">👋</span>
+                </h1>
+                <p className="mt-4 max-w-xl text-base leading-7 text-slate-600 dark:text-[#94A3B8]">
+                  Ready to continue creating today?
+                </p>
+              </div>
             </div>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

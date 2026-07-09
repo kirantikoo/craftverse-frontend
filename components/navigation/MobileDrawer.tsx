@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, LogIn } from "lucide-react";
+import UserAvatar from "@/components/common/UserAvatar";
 import { navItems } from "@/data/navigation";
 import { useAuth } from "@/src/context/AuthContext";
 import {
@@ -20,8 +21,7 @@ type MobileDrawerProps = {
 
 export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const pathname = usePathname();
-  const { displayName, isLoggedIn, loading, userProfile } = useAuth();
-  const avatarInitial = displayName.charAt(0).toUpperCase() || "C";
+  const { displayName, isLoggedIn, loading, user, userProfile } = useAuth();
   const hasPremium = userProfile?.plan === "premium" && userProfile?.subscriptionStatus === "active";
 
   return (
@@ -56,9 +56,12 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
               <div className="rounded-3xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-[#0f1b2f]/75">
                 {isLoggedIn ? (
                   <Link href="/profile" onClick={() => onOpenChange(false)} className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
-                      {avatarInitial}
-                    </span>
+                    <UserAvatar
+                      user={user}
+                      userProfile={userProfile}
+                      className="h-11 w-11 shrink-0 rounded-2xl object-cover"
+                      fallbackClassName="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white"
+                    />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-black text-slate-900 dark:text-white">
                         {displayName}

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import UserAvatar from "@/components/common/UserAvatar";
 import { useAuth } from "@/src/context/AuthContext";
 import { auth } from "@/src/lib/firebase";
 
@@ -29,11 +30,10 @@ const menuItems = [
 ];
 
 export default function UserMenu({ className = "", displayName }: UserMenuProps) {
-  const { userProfile } = useAuth();
+  const { user, userProfile } = useAuth();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const avatarInitial = displayName.charAt(0).toUpperCase() || "C";
   const isAdmin = userProfile?.role === "admin";
 
   useEffect(() => {
@@ -98,9 +98,12 @@ export default function UserMenu({ className = "", displayName }: UserMenuProps)
         onClick={() => setOpen((current) => !current)}
         className="flex h-11 w-11 min-w-0 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 p-1.5 shadow-sm transition hover:border-cyan-400/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/20 dark:border-white/10 dark:bg-white/10 sm:w-auto sm:gap-2 sm:pr-3"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-sm font-black text-white">
-          {avatarInitial}
-        </span>
+        <UserAvatar
+          user={user}
+          userProfile={userProfile}
+          className="h-8 w-8 shrink-0 rounded-xl object-cover"
+          fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-sm font-black text-white"
+        />
         <span className="hidden max-w-28 truncate text-sm font-black text-slate-800 dark:text-white sm:block">
           {displayName}
         </span>

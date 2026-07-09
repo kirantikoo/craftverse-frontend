@@ -206,12 +206,6 @@ async function getFirestoreUserProfile(user: User) {
 }
 
 export async function ensureUserProfile(user: User) {
-  const syncedProfile = await syncUserProfileWithApi(user);
-
-  if (syncedProfile) {
-    return syncedProfile;
-  }
-
   try {
     const firestoreProfile = await getFirestoreUserProfile(user);
     if (firestoreProfile) {
@@ -219,6 +213,12 @@ export async function ensureUserProfile(user: User) {
     }
   } catch {
     console.warn("Saved CraftVerse profile is not available. Using Firebase account details.");
+  }
+
+  const syncedProfile = await syncUserProfileWithApi(user);
+
+  if (syncedProfile) {
+    return syncedProfile;
   }
 
   return normalizeUserProfile(user);
