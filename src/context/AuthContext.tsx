@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import {
   createContext,
   useContext,
@@ -15,7 +16,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { auth, googleProvider } from "@/src/lib/firebase";
+import { auth, db, googleProvider } from "@/src/lib/firebase";
 import { getUserDisplayName } from "@/src/lib/user";
 
 export type UserProfile = {
@@ -25,21 +26,14 @@ export type UserProfile = {
   email: string | null;
   photoURL: string | null;
   country?: string;
-  role?: "user" | "admin";
-  plan?: "trial" | "premium" | "free";
+  role?: "user" | "creator" | "moderator" | "admin" | "superadmin";
+  plan?: "trial" | "premium" | "free" | "admin";
   trialStartedAt?: Date | string | number | { toDate: () => Date };
   trialEndsAt?: Date | string | number | { toDate: () => Date };
   subscriptionStatus: "trial" | "active" | "expired" | "canceled";
   createdAt?: Date | string | number | { toDate: () => Date };
   updatedAt?: Date | string | number | { toDate: () => Date };
 };
-
-class ProfileSyncError extends Error {
-  constructor(message = PROFILE_ERROR_MESSAGE) {
-    super(message);
-    this.name = "ProfileSyncError";
-  }
-}
 
 type AuthContextValue = {
   user: User | null;
@@ -138,6 +132,7 @@ async function getApiErrorMessage(response: Response) {
 
 function normalizeUserProfile(user: User, profile: Partial<UserProfile> = {}): UserProfile {
   const name = profile.name?.trim() || profile.displayName?.trim() || getUserDisplayName(user);
+  const role = typeof profile.role === "string" ? profile.role.toLowerCase() : "user";
 
   return {
     ...profile,
@@ -147,7 +142,7 @@ function normalizeUserProfile(user: User, profile: Partial<UserProfile> = {}): U
     email: profile.email ?? user.email,
     photoURL: profile.photoURL ?? user.photoURL,
     country: profile.country || detectCountry(),
-    role: profile.role || "user",
+    role: role as UserProfile["role"],
     subscriptionStatus: profile.subscriptionStatus || "trial",
   };
 }
@@ -158,35 +153,75 @@ function unwrapProfileResponse(responseBody: unknown) {
   }
 
   const body = responseBody as {
+    data?: Partial<UserProfile> & {
+      profile?: Partial<UserProfile>;
+      user?: Partial<UserProfile>;
+    };
     profile?: Partial<UserProfile>;
     user?: Partial<UserProfile>;
   };
 
-  return body.profile ?? body.user ?? (responseBody as Partial<UserProfile>);
+  return body.profile ?? body.user ?? body.data?.profile ?? body.data?.user ?? body.data ?? (responseBody as Partial<UserProfile>);
+}
+
+async function syncUserProfileWithApi(user: User) {
+  const token = await user.getIdToken();
+
+  try {
+    const response = await fetch(`${getApiUrl()}/api/auth/sync-user`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: user.displayName || "",
+        email: user.email || "",
+        photoURL: user.photoURL || "",
+        country: detectCountry(),
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("CraftVerse profile sync failed:", await getApiErrorMessage(response));
+      return null;
+    }
+
+    const responseBody = (await response.json()) as unknown;
+    return normalizeUserProfile(user, unwrapProfileResponse(responseBody));
+  } catch {
+    console.warn("CraftVerse API is not reachable. Using your saved profile if available.");
+    return null;
+  }
+}
+
+async function getFirestoreUserProfile(user: User) {
+  const userSnapshot = await getDoc(doc(db, "users", user.uid));
+
+  if (!userSnapshot.exists()) {
+    return null;
+  }
+
+  return normalizeUserProfile(user, userSnapshot.data() as Partial<UserProfile>);
 }
 
 export async function ensureUserProfile(user: User) {
-  const token = await user.getIdToken();
-  const response = await fetch(`${getApiUrl()}/api/auth/sync-user`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: user.displayName || "",
-      email: user.email || "",
-      photoURL: user.photoURL || "",
-      country: detectCountry(),
-    }),
-  });
+  const syncedProfile = await syncUserProfileWithApi(user);
 
-  if (!response.ok) {
-    throw new ProfileSyncError(await getApiErrorMessage(response));
+  if (syncedProfile) {
+    return syncedProfile;
   }
 
-  const responseBody = (await response.json()) as unknown;
-  return normalizeUserProfile(user, unwrapProfileResponse(responseBody));
+  try {
+    const firestoreProfile = await getFirestoreUserProfile(user);
+    if (firestoreProfile) {
+      return firestoreProfile;
+    }
+  } catch {
+    console.warn("Saved CraftVerse profile is not available. Using Firebase account details.");
+  }
+
+  return normalizeUserProfile(user);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -211,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const profile = await ensureUserProfile(currentUser);
         setUserProfile(profile);
       } catch (error) {
-        console.error("Unable to load CraftVerse user profile", error);
+        console.warn("Unable to load CraftVerse user profile:", getProfileErrorMessage(error));
         setProfileError(getProfileErrorMessage(error));
         setUserProfile(null);
       } finally {

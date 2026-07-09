@@ -20,9 +20,9 @@ type MobileDrawerProps = {
 
 export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const pathname = usePathname();
-  const { displayName, isLoggedIn, loading } = useAuth();
-  const visibleNavItems = navItems.filter((item) => !item.requiresAuth || isLoggedIn);
+  const { displayName, isLoggedIn, loading, userProfile } = useAuth();
   const avatarInitial = displayName.charAt(0).toUpperCase() || "C";
+  const hasPremium = userProfile?.plan === "premium" && userProfile?.subscriptionStatus === "active";
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -52,32 +52,49 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
           </Link>
 
           {!loading ? (
-            <div className="mb-5 rounded-3xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-[#0f1b2f]/75">
-              {isLoggedIn ? (
-                <Link href="/profile" onClick={() => onOpenChange(false)} className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
-                    {avatarInitial}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-black text-slate-900 dark:text-white">
-                      {displayName}
+            <div className="mb-5 shrink-0 space-y-4">
+              <div className="rounded-3xl border border-[#008099]/15 bg-[#FFF8F3] p-4 dark:border-white/10 dark:bg-[#0f1b2f]/75">
+                {isLoggedIn ? (
+                  <Link href="/profile" onClick={() => onOpenChange(false)} className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
+                      {avatarInitial}
                     </span>
-                    <span className="block text-xs font-semibold text-slate-500 dark:text-slate-300">
-                      CraftVerse creator
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-black text-slate-900 dark:text-white">
+                        {displayName}
+                      </span>
+                      <span className="block text-xs font-semibold text-slate-500 dark:text-slate-300">
+                        CraftVerse creator
+                      </span>
                     </span>
-                  </span>
+                  </Link>
+                ) : (
+                  <Link href="/login" onClick={() => onOpenChange(false)} className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#008099] px-4 text-sm font-black text-white shadow-lg">
+                    <LogIn size={17} />
+                    Login
+                  </Link>
+                )}
+              </div>
+
+              <div className="overflow-hidden rounded-3xl border border-purple-200 bg-gradient-to-br from-violet-100 via-white to-pink-100 p-5 shadow-lg dark:border-purple-400/30 dark:from-purple-950/80 dark:via-[#10183a] dark:to-pink-950/70">
+                <p className="text-2xl">{hasPremium ? "⭐" : "👑"}</p>
+                <h3 className="mt-2 text-lg font-black text-purple-800 dark:text-yellow-300">
+                  {hasPremium ? "Premium Member" : "Upgrade to Pro"}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">
+                  {hasPremium
+                    ? "Thank you for supporting CraftVerse."
+                    : "Unlock premium tutorials, materials, AI Tutor, exclusive patterns and more."}
+                </p>
+                <Link href="/pricing" onClick={() => onOpenChange(false)} className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 px-4 font-bold text-white shadow-lg transition hover:brightness-110">
+                  {hasPremium ? "Manage Subscription →" : "Upgrade Now →"}
                 </Link>
-              ) : (
-                <Link href="/login" onClick={() => onOpenChange(false)} className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#008099] px-4 text-sm font-black text-white shadow-lg">
-                  <LogIn size={17} />
-                  Login
-                </Link>
-              )}
+              </div>
             </div>
           ) : null}
 
           <nav className="craft-scrollbar flex-1 space-y-2 overflow-y-auto pr-1">
-            {visibleNavItems.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               const active = item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -103,13 +120,6 @@ export default function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) 
               );
             })}
           </nav>
-
-          <div className="mt-6 shrink-0 overflow-hidden rounded-3xl border border-purple-200 bg-gradient-to-br from-violet-100 via-white to-pink-100 p-5 shadow-lg dark:border-purple-400/30 dark:from-purple-950/80 dark:via-[#10183a] dark:to-pink-950/70">
-            <p className="text-2xl">👑</p>
-            <h3 className="mt-2 text-lg font-black text-purple-800 dark:text-yellow-300">Upgrade to Pro</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">Unlock premium tutorials, materials & more.</p>
-            <Link href="/pricing" onClick={() => onOpenChange(false)} className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 font-bold text-white shadow-lg">Upgrade Now →</Link>
-          </div>
         </div>
       </SheetContent>
     </Sheet>

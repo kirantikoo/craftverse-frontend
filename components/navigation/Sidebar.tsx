@@ -9,9 +9,9 @@ import { useAuth } from "@/src/context/AuthContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { displayName, isLoggedIn, loading } = useAuth();
-  const visibleNavItems = navItems.filter((item) => !item.requiresAuth || isLoggedIn);
+  const { displayName, isLoggedIn, loading, userProfile } = useAuth();
   const avatarInitial = displayName.charAt(0).toUpperCase() || "C";
+  const hasPremium = userProfile?.plan === "premium" && userProfile?.subscriptionStatus === "active";
 
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[272px] overflow-hidden border-r border-slate-200 bg-white/90 p-5 shadow-[0_0_60px_rgba(14,165,233,0.10)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#071020]/90 dark:shadow-[0_0_70px_rgba(0,0,0,0.35)] lg:flex lg:flex-col">
@@ -41,7 +41,7 @@ export default function Sidebar() {
 
       <div className="craft-scrollbar relative flex-1 overflow-y-auto pr-1">
         <nav className="space-y-2">
-          {visibleNavItems.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const active = item.href === "/" ? pathname === "/" : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -80,9 +80,11 @@ export default function Sidebar() {
             );
           })}
         </nav>
+      </div>
 
-        {!loading ? (
-          <div className="mt-7 rounded-3xl border border-[#008099]/15 bg-white/85 p-4 shadow-lg dark:border-white/10 dark:bg-[#0f1b2f]/75">
+      {!loading ? (
+        <div className="relative mt-5 shrink-0 space-y-4">
+          <div className="rounded-3xl border border-[#008099]/15 bg-white/85 p-4 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-[#0f1b2f]/75">
             {isLoggedIn ? (
               <Link href="/profile" className="flex min-w-0 items-center gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#008099] via-[#7C4DFF] to-[#4EFE32] text-base font-black text-white">
@@ -104,22 +106,24 @@ export default function Sidebar() {
               </Link>
             )}
           </div>
-        ) : null}
 
-        <div className="mt-7 overflow-hidden rounded-3xl border border-purple-200 bg-gradient-to-br from-violet-100 via-white to-pink-100 p-5 shadow-lg dark:border-purple-400/30 dark:bg-gradient-to-br dark:from-purple-950/80 dark:via-[#10183a] dark:to-pink-950/70 dark:shadow-xl">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-pink-400/25 blur-3xl dark:bg-pink-500/30" />
-          <p className="text-2xl">👑</p>
-          <h3 className="mt-2 text-lg font-black text-purple-800 dark:text-yellow-300">
-            Upgrade to Pro
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">
-            Unlock premium tutorials, materials & more.
-          </p>
-          <Link href="/pricing" className="mt-5 block w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 px-4 py-3 text-center font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:brightness-110">
-            Upgrade Now →
-          </Link>
+          <div className="overflow-hidden rounded-3xl border border-purple-200 bg-gradient-to-br from-violet-100 via-white to-pink-100 p-5 shadow-[0_18px_50px_rgba(124,77,255,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_70px_rgba(236,72,153,0.26)] dark:border-purple-400/30 dark:bg-gradient-to-br dark:from-purple-950/80 dark:via-[#10183a] dark:to-pink-950/70 dark:shadow-xl">
+            <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-pink-400/25 blur-3xl dark:bg-pink-500/30" />
+            <p className="text-2xl">{hasPremium ? "⭐" : "👑"}</p>
+            <h3 className="mt-2 text-lg font-black text-purple-800 dark:text-yellow-300">
+              {hasPremium ? "Premium Member" : "Upgrade to Pro"}
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/75">
+              {hasPremium
+                ? "Thank you for supporting CraftVerse."
+                : "Unlock premium tutorials, materials, AI Tutor, exclusive patterns and more."}
+            </p>
+            <Link href="/pricing" className="mt-5 block w-full rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 px-4 py-3 text-center font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:brightness-110">
+              {hasPremium ? "Manage Subscription →" : "Upgrade Now →"}
+            </Link>
+          </div>
         </div>
-      </div>
+      ) : null}
     </aside>
   );
 }
