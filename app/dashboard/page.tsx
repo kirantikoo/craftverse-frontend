@@ -19,7 +19,7 @@ function DashboardContent() {
         <div className="craft-dark-card rounded-3xl bg-white/85 p-6 shadow-xl sm:p-8 dark:border dark:border-white/10">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#4EFE32]/40 bg-[#4EFE32]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-[#008099] dark:text-[#4EFE32]">
             <Sparkles size={14} />
-            Creator dashboard
+            {displayName ? `${displayName}'s dashboard` : "Your dashboard"}
           </p>
           <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-5xl dark:text-white">
             Welcome back, {displayName}!

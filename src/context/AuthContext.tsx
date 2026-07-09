@@ -8,14 +8,6 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import {
-  FirestoreError,
-  Timestamp,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
-import {
   createContext,
   useContext,
   useEffect,
@@ -23,24 +15,31 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { auth, db, googleProvider } from "@/src/lib/firebase";
-import { getTrialEndDate } from "@/src/lib/subscription";
+import { auth, googleProvider } from "@/src/lib/firebase";
 import { getUserDisplayName } from "@/src/lib/user";
 
 export type UserProfile = {
   uid: string;
-  displayName: string;
+  displayName?: string;
   name?: string;
   email: string | null;
   photoURL: string | null;
-  role: "user" | "admin";
+  country?: string;
+  role?: "user" | "admin";
   plan?: "trial" | "premium" | "free";
-  trialStartedAt: Timestamp;
-  trialEndsAt: Timestamp;
+  trialStartedAt?: Date | string | number | { toDate: () => Date };
+  trialEndsAt?: Date | string | number | { toDate: () => Date };
   subscriptionStatus: "trial" | "active" | "expired" | "canceled";
-  createdAt?: Timestamp;
-  updatedAt?: Timestamp;
+  createdAt?: Date | string | number | { toDate: () => Date };
+  updatedAt?: Date | string | number | { toDate: () => Date };
 };
+
+class ProfileSyncError extends Error {
+  constructor(message = PROFILE_ERROR_MESSAGE) {
+    super(message);
+    this.name = "ProfileSyncError";
+  }
+}
 
 type AuthContextValue = {
   user: User | null;
@@ -57,7 +56,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const PROFILE_ERROR_MESSAGE =
-  "You are signed in, but CraftVerse could not save your profile yet. Please check your connection or Firebase permissions.";
+  "You are signed in, but CraftVerse could not save your profile yet. Please check your connection or try again.";
 
 export function getAuthErrorMessage(error: unknown) {
   const code =
@@ -83,50 +82,111 @@ export function getAuthErrorMessage(error: unknown) {
     case "auth/popup-closed-by-user":
       return "Google sign-in was closed before it finished.";
     default:
+      if (error instanceof Error && error.message) {
+        return error.message;
+      }
+
       return "Something went wrong. Please try again.";
   }
 }
 
-function isFirestorePermissionError(error: unknown) {
-  return error instanceof FirestoreError && error.code === "permission-denied";
-}
-
 function getProfileErrorMessage(error: unknown) {
-  if (isFirestorePermissionError(error)) {
-    return "You are signed in, but CraftVerse cannot access your profile because Firestore permissions need updating.";
+  if (error instanceof Error && error.message) {
+    return error.message;
   }
 
   return PROFILE_ERROR_MESSAGE;
 }
 
-export async function ensureUserProfile(user: User) {
-  const userRef = doc(db, "users", user.uid);
-  const userSnapshot = await getDoc(userRef);
-
-  if (userSnapshot.exists()) {
-    return userSnapshot.data() as UserProfile;
+function detectCountry() {
+  if (typeof navigator === "undefined") {
+    return "AU";
   }
 
-  const now = new Date();
-  const newProfile: UserProfile = {
-    uid: user.uid,
-    displayName: getUserDisplayName(user),
-    email: user.email,
-    photoURL: user.photoURL,
-    role: "user",
-    plan: "trial",
-    trialStartedAt: Timestamp.fromDate(now),
-    trialEndsAt: Timestamp.fromDate(getTrialEndDate(now)),
-    subscriptionStatus: "trial",
+  const locale = navigator.languages?.[0] ?? navigator.language;
+
+  try {
+    const region = new Intl.Locale(locale).region;
+    return region || "AU";
+  } catch {
+    return "AU";
+  }
+}
+
+function getApiUrl() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+
+  if (!apiUrl) {
+    throw new Error("CraftVerse API URL is not configured.");
+  }
+
+  return apiUrl;
+}
+
+async function getApiErrorMessage(response: Response) {
+  try {
+    const responseBody = (await response.json()) as {
+      error?: string;
+      message?: string;
+    };
+
+    return responseBody.message || responseBody.error || PROFILE_ERROR_MESSAGE;
+  } catch {
+    return PROFILE_ERROR_MESSAGE;
+  }
+}
+
+function normalizeUserProfile(user: User, profile: Partial<UserProfile> = {}): UserProfile {
+  const name = profile.name?.trim() || profile.displayName?.trim() || getUserDisplayName(user);
+
+  return {
+    ...profile,
+    uid: profile.uid || user.uid,
+    name,
+    displayName: profile.displayName?.trim() || name,
+    email: profile.email ?? user.email,
+    photoURL: profile.photoURL ?? user.photoURL,
+    country: profile.country || detectCountry(),
+    role: profile.role || "user",
+    subscriptionStatus: profile.subscriptionStatus || "trial",
+  };
+}
+
+function unwrapProfileResponse(responseBody: unknown) {
+  if (typeof responseBody !== "object" || responseBody === null) {
+    return {};
+  }
+
+  const body = responseBody as {
+    profile?: Partial<UserProfile>;
+    user?: Partial<UserProfile>;
   };
 
-  await setDoc(userRef, {
-    ...newProfile,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  return body.profile ?? body.user ?? (responseBody as Partial<UserProfile>);
+}
+
+export async function ensureUserProfile(user: User) {
+  const token = await user.getIdToken();
+  const response = await fetch(`${getApiUrl()}/api/auth/sync-user`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: user.displayName || "",
+      email: user.email || "",
+      photoURL: user.photoURL || "",
+      country: detectCountry(),
+    }),
   });
 
-  return newProfile;
+  if (!response.ok) {
+    throw new ProfileSyncError(await getApiErrorMessage(response));
+  }
+
+  const responseBody = (await response.json()) as unknown;
+  return normalizeUserProfile(user, unwrapProfileResponse(responseBody));
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -172,6 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Unable to save CraftVerse profile after email login", error);
       setProfileError(getProfileErrorMessage(error));
+      throw error;
     }
   };
 
@@ -185,6 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Unable to save CraftVerse profile after signup", error);
       setProfileError(getProfileErrorMessage(error));
+      throw error;
     }
   };
 
@@ -198,10 +260,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Unable to save CraftVerse profile after Google login", error);
       setProfileError(getProfileErrorMessage(error));
+      throw error;
     }
   };
 
-  const displayName = userProfile?.displayName ?? userProfile?.name ?? getUserDisplayName(user);
+  const displayName = userProfile?.name || userProfile?.displayName || getUserDisplayName(user);
   const value = useMemo(
     () => ({
       user,
