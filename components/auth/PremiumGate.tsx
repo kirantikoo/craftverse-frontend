@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/src/context/AuthContext";
-import { isTrialActive } from "@/src/lib/subscription";
+import { hasPremiumAccess as profileHasPremiumAccess } from "@/src/lib/access";
 
 function UpgradeScreen() {
   return (
@@ -39,10 +39,9 @@ function PremiumGateContent({ children }: { children: ReactNode }) {
     );
   }
 
-  const hasPremiumAccess =
-    userProfile?.plan === "premium" || isTrialActive(userProfile?.trialEndsAt);
+  const canViewPremium = profileHasPremiumAccess(userProfile);
 
-  if (!hasPremiumAccess) {
+  if (!canViewPremium) {
     return <UpgradeScreen />;
   }
 

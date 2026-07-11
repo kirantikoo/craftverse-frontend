@@ -7,7 +7,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import {
   createContext,
   useContext,
@@ -17,7 +17,10 @@ import {
   type ReactNode,
 } from "react";
 import { auth, db, googleProvider } from "@/src/lib/firebase";
+import { SUPERADMIN_EMAIL, type AppPlan, type AppRole } from "@/src/lib/access";
+import { getTrialEndDate } from "@/src/lib/subscription";
 import { getUserDisplayName } from "@/src/lib/user";
+import type { CraftInterest, LearningGoal, SkillLevel } from "@/src/lib/personalization";
 
 export type UserProfile = {
   uid: string;
@@ -26,13 +29,17 @@ export type UserProfile = {
   email: string | null;
   photoURL: string | null;
   country?: string;
-  role?: "user" | "creator" | "moderator" | "admin" | "superadmin";
-  plan?: "trial" | "premium" | "free" | "admin";
+  role?: AppRole;
+  plan?: AppPlan;
   trialStartedAt?: Date | string | number | { toDate: () => Date };
   trialEndsAt?: Date | string | number | { toDate: () => Date };
   subscriptionStatus: "trial" | "active" | "expired" | "canceled";
   createdAt?: Date | string | number | { toDate: () => Date };
   updatedAt?: Date | string | number | { toDate: () => Date };
+  interests: CraftInterest[];
+  skillLevel?: SkillLevel;
+  learningGoals: LearningGoal[];
+  onboardingCompleted: boolean;
 };
 
 type AuthContextValue = {
@@ -42,6 +49,7 @@ type AuthContextValue = {
   isLoggedIn: boolean;
   userProfile: UserProfile | null;
   profileError: string;
+  refreshUserProfile: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -92,6 +100,26 @@ function getProfileErrorMessage(error: unknown) {
   return PROFILE_ERROR_MESSAGE;
 }
 
+function normalizeRole(role: unknown, email: string | null | undefined): AppRole {
+  if (role === "admin" || role === "superadmin" || role === "user") {
+    return role;
+  }
+
+  if (!role && email?.toLowerCase() === SUPERADMIN_EMAIL) {
+    return "superadmin";
+  }
+
+  return "user";
+}
+
+function normalizePlan(plan: unknown): AppPlan {
+  if (plan === "premium" || plan === "free" || plan === "trial") {
+    return plan;
+  }
+
+  return "trial";
+}
+
 function detectCountry() {
   if (typeof navigator === "undefined") {
     return "AU";
@@ -132,18 +160,32 @@ async function getApiErrorMessage(response: Response) {
 
 function normalizeUserProfile(user: User, profile: Partial<UserProfile> = {}): UserProfile {
   const name = profile.name?.trim() || profile.displayName?.trim() || getUserDisplayName(user);
-  const role = typeof profile.role === "string" ? profile.role.toLowerCase() : "user";
+  const email = profile.email ?? user.email;
+  const role = normalizeRole(
+    typeof profile.role === "string" ? profile.role.toLowerCase() : profile.role,
+    email,
+  );
+  const plan = normalizePlan(profile.plan);
+  const trialStartedAt = profile.trialStartedAt ?? new Date();
+  const trialEndsAt = profile.trialEndsAt ?? getTrialEndDate(new Date());
 
   return {
     ...profile,
     uid: profile.uid || user.uid,
     name,
     displayName: profile.displayName?.trim() || name,
-    email: profile.email ?? user.email,
+    email,
     photoURL: profile.photoURL ?? user.photoURL,
     country: profile.country || detectCountry(),
-    role: role as UserProfile["role"],
+    role,
+    plan,
+    trialStartedAt,
+    trialEndsAt,
     subscriptionStatus: profile.subscriptionStatus || "trial",
+    interests: Array.isArray(profile.interests) ? profile.interests : [],
+    learningGoals: Array.isArray(profile.learningGoals) ? profile.learningGoals : [],
+    skillLevel: profile.skillLevel,
+    onboardingCompleted: role === "admin" || role === "superadmin" ? true : profile.onboardingCompleted === true,
   };
 }
 
@@ -179,6 +221,13 @@ async function syncUserProfileWithApi(user: User) {
         email: user.email || "",
         photoURL: user.photoURL || "",
         country: detectCountry(),
+        role: "user",
+        plan: "trial",
+        trialLengthDays: 15,
+        interests: [],
+        learningGoals: [],
+        skillLevel: null,
+        onboardingCompleted: false,
       }),
     });
 
@@ -196,10 +245,37 @@ async function syncUserProfileWithApi(user: User) {
 }
 
 async function getFirestoreUserProfile(user: User) {
-  const userSnapshot = await getDoc(doc(db, "users", user.uid));
+  const userRef = doc(db, "users", user.uid);
+  const userSnapshot = await getDoc(userRef);
 
   if (!userSnapshot.exists()) {
-    return null;
+    const newProfile = {
+      uid: user.uid,
+      email: user.email ?? null,
+      displayName: user.displayName ?? "",
+      photoURL: user.photoURL ?? null,
+      role: "user" as const,
+      plan: "trial" as const,
+      interests: [] as CraftInterest[],
+      skillLevel: null,
+      learningGoals: [] as LearningGoal[],
+      onboardingCompleted: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    await setDoc(userRef, newProfile);
+    return normalizeUserProfile(user, {
+      uid: newProfile.uid,
+      email: newProfile.email,
+      displayName: newProfile.displayName,
+      photoURL: newProfile.photoURL,
+      role: newProfile.role,
+      plan: newProfile.plan,
+      interests: newProfile.interests,
+      learningGoals: newProfile.learningGoals,
+      onboardingCompleted: newProfile.onboardingCompleted,
+    });
   }
 
   return normalizeUserProfile(user, userSnapshot.data() as Partial<UserProfile>);
@@ -299,6 +375,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshUserProfile = async () => {
+    if (!auth.currentUser) return;
+    setLoading(true);
+    try { setUserProfile(await ensureUserProfile(auth.currentUser)); setProfileError(""); }
+    catch (error) { setProfileError(getProfileErrorMessage(error)); }
+    finally { setLoading(false); }
+  };
+
   const displayName = userProfile?.name || userProfile?.displayName || getUserDisplayName(user);
   const value = useMemo(
     () => ({
@@ -308,6 +392,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoggedIn: Boolean(user),
       userProfile,
       profileError,
+      refreshUserProfile,
       signInWithEmail,
       signUpWithEmail,
       signInWithGoogle,

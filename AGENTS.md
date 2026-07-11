@@ -1,425 +1,953 @@
-CraftVerse
-Vision
-CraftVerse is an AI-powered creative ecosystem where people can:
-• Learn sewing and crafts
-• Follow structured projects
-• Watch curated YouTube tutorials
-• Receive AI guidance in multiple languages
-• Earn XP and rewards
-• Share creations
-• Build reputation
-• Sell handmade products and digital assets
-• Progress inside a cozy creative world
+# CraftVerse AGENTS.md
 
-CraftVerse combines:
-• Pinterest (inspiration)
-• Duolingo (learning)
-• Etsy (commerce)
-• Animal Crossing (cozy progression)
-• Roblox (social creativity)
+Version: 1.0
+Status: Long-Term Master Plan
+Project Owner: Sonu
+Platform: CraftVerse
+Website: (To be added)
+Repository Structure:
 
-Mission:
-Make creativity fun, accessible and rewarding for everyone.
+- craftverse-frontend
+- craftverse-backend
+- craftverse-admin
 
-Product Philosophy
-CraftVerse is NOT:
-• A YouTube clone
-• A MMORPG
-• A generic marketplace
-CraftVerse IS:
-Learn → Create → Share → Sell → Progress
+---
 
-Core Target Audience
-Primary
-• Teens (13+)
-• Adults
-• Hobbyists
-• Sewing enthusiasts
-• Crochet creators
-• Home-based businesses
-• DIY makers
-• Parents
-Secondary
-• Teachers
-• Schools
-• Craft communities
-• Handmade brands
+# Vision
 
-Main User Journey
-Learn
+CraftVerse is an AI-powered Art & Craft Learning Platform where anyone can learn, create, teach, sell, and build a creative business.
+
+Unlike YouTube, CraftVerse provides an interactive AI tutor that guides learners one step at a time, checks their work using AI, and unlocks the next lesson only after successful completion.
+
+The long-term goal is to become the world's largest AI-powered platform for crafts, sewing, crochet, knitting, embroidery, DIY, painting, woodworking, resin art, paper crafts, jewelry making, and many more creative skills.
+
+---
+
+# Core Philosophy
+
+One Tutorial
 ↓
-Watch Tutorial
-↓
-AI Guidance
-↓
-Complete Project
-↓
-Upload Result
-↓
-Earn XP
-↓
-Unlock Badges
-↓
-Build Reputation
-↓
-Sell Products
-↓
-Become Craft Master
 
-Platform Structure
-craftverse.com.au
-/
-├── home
-├── explore
-├── learn
-├── tutorials
-├── sewing
-├── stitching
-├── crochet
-├── embroidery
-├── painting
-├── knitting
-├── diy
-├── ai-tutor
-├── community
-├── collections
-├── projects
-├── shop
-├── profile
-├── dashboard
-├── notifications
-├── settings
-└── admin
-Future
-/world
-/guilds
-/events
-/challenges
+Many Outputs
 
-Main Categories
-Sewing and Garment Making
-• Machine Basics
-• Measurements
-• Fabric Selection
-• Kurti Stitching
-• Blouses
-• Dresses
-• Kids Wear
-• Palazzo Pants
-• Sleeve Designs
-• Collar Designs
-• Neck Designs
-• Alterations
-• Pattern Making
-Crochet
-• Flowers
-• Bags
-• Toys
-• Blankets
-Embroidery
-Painting
-Resin Art
-Clay Art
-Origami
-Knitting
-DIY Projects
+A creator should create content only once.
 
-Content Strategy
-Do NOT host copyrighted videos.
-Use:
-Embedded YouTube videos with attribution.
-CraftVerse adds value through:
-• AI summaries
-• Materials list
-• Step-by-step lessons
-• Progress tracking
-• Community
-• Gamification
+CraftVerse automatically generates:
 
-Tutorial Structure
-Difficulty
-Time Required
-Materials
-Embedded YouTube Video
-AI Summary
-Step 1
-Step 2
-Step 3
-Step 4
-Tips
-Common Mistakes
-Upload Result
-Earn XP
-Comments
-
-AI Tutor
-OpenAI + Gemini
-Capabilities
-• Explain concepts
-• Material substitution
-• Recommend projects
-• Answer questions
-• Translate instructions
-• Simplify difficult steps
-Supports:
-• English
-• Hindi
-• Punjabi
-• Spanish
-• French
-• Arabic
-Multilingual System
-Video remains original.
-AI generates:
-• English instructions
-• Hindi instructions
-• Punjabi instructions
-• Other languages
-No copyright infringement.
-
-AI Features
-Free
-AI Tutor
-Project Suggestions
-Step Explanations
-Translations
-Material Alternatives
-Premium
-AI Pattern Generator
-AI Camera Assistant
-Advanced Tutorials
-Unlimited AI
-Future AI Video Generator
-
-AI Camera Assistant
-User uploads image.
-Gemini detects:
-• Stitching mistakes
-• Fabric type
-• Neck shape
-• Measurements
-• Seam allowance problems
-Suggestions:
-"Increase seam allowance by 1 cm."
-
-AI Pattern Generator
-Generate
-• Dress patterns
-• Sleeve patterns
-• Blouse patterns
-• Collar patterns
-Outputs
-• SVG
-• PDF
-• PNG
-Premium feature.
-
-Gamification
-Levels
-Beginner
-↓
-Maker
-↓
-Creator
-↓
-Artisan
-↓
-Craft Master
-↓
-Legend
-Rewards
-• XP
-• Coins
-• Streaks
-• Badges
-• Achievements
-
-Daily Quests
-Complete Tutorial
-Upload Project
-Comment
-Maintain Streak
-Learn New Skill
-
-Seasonal Events
-Christmas Crafts
-Diwali Sewing Festival
-Summer Fashion Week
-Halloween DIY
-Mother's Day
-Ramadan Collection
-
-Community
-Profiles
-Followers
-Likes
-Comments
-Challenges
-Forums
-Creator Pages
-Future Guilds
-
-Marketplace
-Physical Products
-• Handmade Clothes
-• Crochet Toys
-• Paintings
-• Accessories
-Digital Products
-• Patterns
-• SVG Files
-• PDFs
-• Tutorial Bundles
-Commission
-5-8%
-
-Creator Economy
-Creators can
-• Upload projects
-• Sell courses
-• Sell patterns
-• Build followers
-Revenue sharing supported.
-
-Premium Membership
-AUD 9.99/month
-Benefits
-• Unlimited AI
-• Advanced Tutorials
-• Pattern Generator
-• Premium Badges
-• More Storage
-• Exclusive Avatars
-
-Tech Stack
-Frontend
-• Next.js 16
-• TypeScript
-• TailwindCSS
-• Shadcn UI
-• PWA
-Backend
-Supabase
-Database
-PostgreSQL
-Realtime
-Supabase Realtime
-Storage
-Cloudflare R2
-Search
-PostgreSQL Full Text Search
-Payments
-Stripe
-Marketplace
-Stripe Connect
-Notifications
-Firebase Cloud Messaging
-Analytics
-PostHog
-Error Tracking
-Sentry
-
-AI Stack
-OpenAI
-Used for
+• Interactive AI lessons
+• Website course
+• Mobile lesson
 • AI Tutor
-• Prompt Generation
-• Pattern Generation
-Gemini
-Used for
-• Vision
-• Camera Assistant
-• Measurement Detection
-Claude
-Used for
-• Long-form Tutorials
-• Structured Content
+• Long YouTube video
+• YouTube Shorts
+• Instagram Reels
+• Facebook Reels
+• Pinterest Pins
+• Blog articles
+• SEO pages
+• PDF guides
+• Email newsletters
+• Quizzes
+• Certificates
+• Marketing content
 
-Security
-Supabase RLS
-Role Permissions
-Spam Detection
-Content Reporting
-Image Moderation
-Rate Limiting
-Audit Logs
+Everything comes from one structured source.
 
-Admin Panel
-Dashboard
-Users
-Creators
-Tutorials
-Community
-Marketplace
-Orders
-Reports
-Analytics
-Subscriptions
-AI Usage
-Moderation
-Settings
+---
 
-Monetization
-Freemium
-Premium Membership
-Marketplace Commission
-Digital Patterns
-Creator Courses
-Sponsored Content
-Affiliate Products
-Craft Kits
-Ads
-Season Pass
+# The CraftVerse Difference
 
-Development Roadmap
-Phase 1
-Authentication
-Profiles
-Tutorials
-Embedded YouTube Videos
-AI Tutor
-Community
-PWA
-Phase 2
-XP
-Badges
-Streaks
-Daily Challenges
+Traditional Platforms
+
+Watch video
+↓
+
+Try yourself
+↓
+
+Get stuck
+↓
+
+Leave
+
+CraftVerse
+
+Watch Step 1
+↓
+
+Click Done
+↓
+
+Upload Photo
+↓
+
+AI Checks Work
+↓
+
+AI Gives Feedback
+↓
+
+Fix Mistakes
+↓
+
+Unlock Step 2
+
+This creates a real teacher-like experience.
+
+---
+
+# AI Tutor Workflow
+
+Each lesson contains:
+
+Step Video
+
+Voice-over
+
+Text Explanation
+
+Materials
+
+Tools
+
+Safety Tips
+
+Hints
+
+Common Mistakes
+
+Photo Upload
+
+AI Image Validation
+
+Alternative Methods
+
+Material Substitutions
+
+Why This Step Matters
+
+Quiz
+
+XP Reward
+
+Certificate Progress
+
+Completion Badge
+
+---
+
+# AI Features
+
+## AI Vision
+
+Learner uploads photo.
+
+AI checks:
+
+- Stitch quality
+- Alignment
+- Pattern accuracy
+- Yarn tension
+- Missing stitches
+- Incorrect colors
+- Measurements
+- Object shape
+- Completion percentage
+
+Returns:
+
+✔ Great job
+
+or
+
+❌ Try again
+
+with detailed feedback.
+
+---
+
+## AI Coach
+
+User asks:
+
+"I'm stuck."
+
+AI explains the step differently.
+
+Can generate:
+
+Text
+
+Images
+
+Animations
+
+Mini videos
+
+---
+
+## AI Material Helper
+
+"I don't have cotton yarn."
+
+AI suggests alternatives.
+
+---
+
+## AI Question Answering
+
+Users can ask:
+
+Why?
+
+How?
+
+What if?
+
+Can I replace this?
+
+Why is mine different?
+
+AI answers based on tutorial context.
+
+---
+
+# Master Content System
+
+Every tutorial is stored as structured JSON.
+
+Tutorial
+
+Title
+
+Description
+
+Category
+
+Difficulty
+
+Duration
+
+Materials
+
+Tools
+
+Safety
+
+Steps
+
+Thumbnail Prompt
+
+SEO
+
+Social Media
+
+Quiz
+
+Voice-over
+
+Video Prompt
+
+Validation Rules
+
+Completion Rewards
+
+This JSON becomes the single source of truth.
+
+---
+
+# Creator Studio
+
+Creators can:
+
+Upload videos
+
+Create tutorials
+
+Sell digital products
+
+Sell craft kits
+
+Sell patterns
+
+Sell templates
+
+Sell premium courses
+
+Manage students
+
+View earnings
+
+Receive analytics
+
+Generate AI content automatically
+
+---
+
+# Content Automation
+
+From one tutorial automatically create:
+
+Website lesson
+
+AI lesson
+
+Long video
+
+Short video
+
+Instagram Reel
+
+Facebook Reel
+
+Pinterest Pin
+
+Blog
+
+Newsletter
+
+Quiz
+
+Thumbnail
+
+Transcript
+
+Captions
+
+SEO
+
+Metadata
+
+Voice-over
+
+---
+
+# Creator Marketplace
+
+Every creator gets:
+
+Public profile
+
+Followers
+
+Ratings
+
+Courses
+
+Products
+
+Reviews
+
 Achievements
-Phase 3
-Marketplace
-Stripe
-Orders
-Digital Products
-Creator Pages
-Phase 4
-AI Pattern Generator
-AI Camera Assistant
-Voice Assistance
-Phase 5
-Workshop
-Inventory
-Avatars
-Decorations
-Phase 6
-Guilds
-Events
-Trading
-Multiplayer
-Phase 7
-2D World
-Phaser
-Phase 8
-3D World
-Babylon.js
 
-Ultimate Vision
-CraftVerse becomes
-Duolingo + Pinterest + Etsy for Sewing and Crafts
-Where real-world creativity becomes a living digital world.
-Learn
-Create
-Share
-Sell
-Belong
-Become Craft Master.
+Creator dashboard
+
+Income analytics
+
+Verified badge
+
+---
+
+# Founding Creator Program
+
+First 100 creators receive:
+
+Verified badge
+
+Priority ranking
+
+Lifetime recognition
+
+Lower platform commission
+
+Direct feedback channel
+
+Early feature access
+
+Exclusive promotions
+
+---
+
+# Learning System
+
+Categories include:
+
+Crochet
+
+Knitting
+
+Sewing
+
+Embroidery
+
+Macrame
+
+Painting
+
+Drawing
+
+Resin Art
+
+Paper Crafts
+
+Origami
+
+DIY
+
+Woodworking
+
+Leather Craft
+
+Jewelry Making
+
+Home Decor
+
+Kids Crafts
+
+Fashion Design
+
+Quilting
+
+Pottery
+
+Many more...
+
+---
+
+# XP System
+
+Users earn XP for:
+
+Watching lessons
+
+Completing steps
+
+Passing quizzes
+
+Uploading photos
+
+Helping community
+
+Daily login
+
+Challenges
+
+Projects
+
+Certificates
+
+Badges unlock levels.
+
+---
+
+# Community
+
+Forums
+
+Groups
+
+Challenges
+
+Competitions
+
+Monthly themes
+
+Creator live streams
+
+Student galleries
+
+Comments
+
+Likes
+
+Following creators
+
+Messaging
+
+---
+
+# Shop
+
+Creators can sell:
+
+Patterns
+
+Templates
+
+Craft kits
+
+Digital downloads
+
+Finished handmade products
+
+Courses
+
+Subscriptions
+
+Bundles
+
+Gift cards
+
+Affiliate products
+
+---
+
+# Revenue Model
+
+## Free Plan
+
+Limited tutorials
+
+Community access
+
+Basic AI
+
+Advertisements
+
+## Premium Plan
+
+Unlimited AI Tutor
+
+Premium courses
+
+Certificates
+
+Offline mode
+
+Downloads
+
+Advanced feedback
+
+Exclusive community
+
+Monthly subscription
+
+Country-based pricing
+
+Stripe integration
+
+---
+
+# Creator Revenue
+
+Revenue sources:
+
+Course sales
+
+Pattern sales
+
+Product sales
+
+Subscriptions
+
+Affiliate income
+
+Craft kits
+
+Brand sponsorships
+
+Tips
+
+Marketplace
+
+Possible revenue split:
+
+Creator: 85–90%
+
+CraftVerse: 10–15%
+
+---
+
+# Marketing Strategy
+
+Primary channels:
+
+YouTube
+
+Instagram
+
+Facebook
+
+Pinterest
+
+TikTok
+
+LinkedIn
+
+Blog
+
+Email
+
+SEO
+
+Every tutorial generates content for all platforms.
+
+---
+
+# YouTube Strategy
+
+Long tutorials
+
+Shorts
+
+Beginner series
+
+Advanced series
+
+Craft hacks
+
+Tips
+
+Behind the scenes
+
+AI-generated voice
+
+Multilingual subtitles
+
+Channel drives users back to CraftVerse.
+
+---
+
+# Instagram Strategy
+
+Reels
+
+Stories
+
+Carousels
+
+Before/After
+
+Daily tips
+
+Community highlights
+
+Creator features
+
+---
+
+# Pinterest Strategy
+
+Pins
+
+Idea Pins
+
+Step graphics
+
+Material guides
+
+Download links
+
+---
+
+# SEO Strategy
+
+Every tutorial creates:
+
+Dedicated webpage
+
+Structured data
+
+FAQ
+
+Blog
+
+Images
+
+Keywords
+
+Metadata
+
+Internal links
+
+---
+
+# Technology Stack
+
+Frontend
+
+Next.js
+
+TypeScript
+
+Tailwind CSS
+
+Framer Motion
+
+Backend
+
+API Architecture
+
+Authentication
+
+Firebase Auth
+
+Database
+
+Firestore initially
+
+Architecture designed so migration to PostgreSQL is possible later.
+
+Storage
+
+Firebase Storage
+
+Payments
+
+Stripe
+
+Analytics
+
+Google Analytics
+
+AI
+
+OpenAI APIs
+
+Vision APIs
+
+Video Generation APIs
+
+Image Generation APIs
+
+Voice APIs
+
+Translation APIs
+
+---
+
+# Repository Structure
+
+craftverse-frontend
+
+Customer website
+
+Learning
+
+Community
+
+Shop
+
+Dashboard
+
+craftverse-backend
+
+REST APIs
+
+Authentication
+
+Tutorial Engine
+
+AI Engine
+
+Creator APIs
+
+Payments
+
+Notifications
+
+craftverse-admin
+
+Manage creators
+
+Moderate content
+
+Approve tutorials
+
+Analytics
+
+Reports
+
+Revenue
+
+Users
+
+---
+
+# Development Roadmap
+
+## Phase 1 – Foundation
+
+✓ Branding
+
+✓ UI/UX
+
+✓ Landing page
+
+✓ Authentication
+
+✓ User dashboard
+
+✓ Creator dashboard
+
+✓ Pricing page
+
+✓ Dark/Light mode
+
+✓ Responsive design
+
+---
+
+## Phase 2 – Learning Platform
+
+Tutorial pages
+
+Progress tracking
+
+Categories
+
+Bookmarks
+
+Favorites
+
+Search
+
+Filtering
+
+Certificates
+
+XP
+
+Achievements
+
+---
+
+## Phase 3 – AI Tutor
+
+Interactive lessons
+
+Step locking
+
+Photo upload
+
+AI feedback
+
+Hints
+
+AI explanations
+
+Progress saving
+
+---
+
+## Phase 4 – Creator Studio
+
+Upload tutorials
+
+Tutorial builder
+
+JSON editor
+
+Analytics
+
+Revenue dashboard
+
+Product management
+
+---
+
+## Phase 5 – Marketplace
+
+Digital downloads
+
+Patterns
+
+Products
+
+Craft kits
+
+Subscriptions
+
+Affiliate products
+
+Reviews
+
+Wishlist
+
+---
+
+## Phase 6 – Community
+
+Groups
+
+Challenges
+
+Messaging
+
+Creator following
+
+Feeds
+
+Notifications
+
+Live events
+
+---
+
+## Phase 7 – AI Automation
+
+Auto video generation
+
+Auto thumbnails
+
+Auto blogs
+
+Auto SEO
+
+Auto social posts
+
+Auto translations
+
+Auto subtitles
+
+Auto quizzes
+
+Auto voice-over
+
+---
+
+## Phase 8 – Mobile Apps
+
+Android
+
+iOS
+
+Offline learning
+
+Push notifications
+
+Camera AI
+
+Downloads
+
+---
+
+## Phase 9 – Global Expansion
+
+Multiple languages
+
+Country pricing
+
+Regional creators
+
+International shipping
+
+Regional content
+
+---
+
+# Long-Term Mission
+
+Become the world's leading AI-powered creative learning ecosystem where:
+
+Students learn interactively.
+
+Creators earn sustainably.
+
+Businesses sell products.
+
+AI assists every step.
+
+One tutorial powers every platform.
+
+CraftVerse becomes the complete ecosystem for the global creative community.

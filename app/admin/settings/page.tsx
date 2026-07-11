@@ -1,0 +1,1 @@
+export default function Page(){return <div className="rounded-2xl border bg-white p-6 dark:bg-white/10"><h2 className="text-2xl font-black">Admin settings</h2><p className="mt-2 text-slate-500">System permissions and sensitive settings are restricted to superadmins and persisted by the backend.</p></div>}

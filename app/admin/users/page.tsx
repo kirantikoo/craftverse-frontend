@@ -1,43 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-
-import { Search, ShieldCheck, Users } from "lucide-react";
-import AdminToolPage from "@/app/admin/AdminToolPage";
-
-export default function AdminUsersPage() {
-  return (
-    <AdminToolPage
-      title="Manage Users"
-      description="User management is protected for CraftVerse admins. Sensitive user actions should remain in the dedicated admin backend."
-    >
-      <div className="grid gap-4 lg:grid-cols-2">
-        <article className="craft-dark-card rounded-3xl bg-white/85 p-6 shadow-xl dark:border dark:border-white/10">
-          <Users size={24} className="text-[#008099] dark:text-[#4EFE32]" />
-          <h2 className="mt-5 text-2xl font-black text-slate-950 dark:text-white">
-            User Directory
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Search, review, and manage creator accounts from the secure admin experience.
-          </p>
-        </article>
-        <article className="craft-dark-card rounded-3xl bg-white/85 p-6 shadow-xl dark:border dark:border-white/10">
-          <ShieldCheck size={24} className="text-[#7C4DFF] dark:text-violet-200" />
-          <h2 className="mt-5 text-2xl font-black text-slate-950 dark:text-white">
-            Role Protection
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            This page only renders when the synced profile has role: &quot;admin&quot;.
-          </p>
-        </article>
-        <article className="craft-dark-card rounded-3xl bg-white/85 p-6 shadow-xl lg:col-span-2 dark:border dark:border-white/10">
-          <Search size={24} className="text-[#008099] dark:text-[#4EFE32]" />
-          <h2 className="mt-5 text-2xl font-black text-slate-950 dark:text-white">
-            Search Preview
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Live user data and destructive actions are intentionally not exposed in this public frontend page.
-          </p>
-        </article>
-      </div>
-    </AdminToolPage>
-  );
-}
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { adminApi } from "@/src/lib/admin-api";
+import { useAuth } from "@/src/context/AuthContext";
+import { canManageAdmins } from "@/src/lib/access";
+type U={uid:string;displayName?:string;name?:string;email:string;role:"user"|"admin"|"superadmin";plan?:string;status?:string;createdAt?:string};
+export default function UsersPage(){const {userProfile}=useAuth();const [users,setUsers]=useState<U[]>([]),[error,setError]=useState(""),[loading,setLoading]=useState(true),[q,setQ]=useState("");const load=useCallback(()=>{setLoading(true);adminApi<U[]>("/users").then(setUsers).catch(e=>setError(e.message)).finally(()=>setLoading(false))},[]);useEffect(load,[load]);const rows=useMemo(()=>users.filter(u=>`${u.name} ${u.displayName} ${u.email}`.toLowerCase().includes(q.toLowerCase())),[users,q]);const change=async(u:U,field:string,value:string)=>{try{await adminApi(`/users/${u.uid}/${field}`,{method:"PATCH",body:JSON.stringify({[field]:value})});load()}catch(e){setError(e instanceof Error?e.message:"Update failed")}};const remove=async(u:U)=>{if(!confirm(`Delete ${u.email}?`))return;try{await adminApi(`/users/${u.uid}`,{method:"DELETE"});load()}catch(e){setError(e instanceof Error?e.message:"Delete failed")}};return <><input className="mb-4 rounded-xl border bg-transparent px-4 py-2" placeholder="Search users" value={q} onChange={e=>setQ(e.target.value)}/>{error&&<p className="mb-4 rounded-xl bg-rose-50 p-3 text-rose-700">{error}</p>}{loading?<div className="h-64 animate-pulse rounded-2xl bg-slate-200 dark:bg-white/10"/>:<div className="overflow-x-auto rounded-2xl border bg-white dark:bg-white/10"><table className="w-full text-left text-sm"><thead><tr className="border-b"><th className="p-4">User</th><th>Role</th><th>Plan</th><th>Status</th><th className="p-4">Actions</th></tr></thead><tbody>{rows.map(u=><tr key={u.uid} className="border-b last:border-0"><td className="p-4"><b>{u.name||u.displayName||'Member'}</b><div className="text-slate-500">{u.email}</div></td><td>{u.role}</td><td><select disabled={u.role==='superadmin'} value={u.plan||'trial'} onChange={e=>change(u,'plan',e.target.value)}><option>trial</option><option>free</option><option>premium</option></select></td><td><select disabled={u.role==='superadmin'} value={u.status||'active'} onChange={e=>change(u,'status',e.target.value)}><option>active</option><option>inactive</option></select></td><td className="p-4 space-x-2">{canManageAdmins(userProfile?.role)&&u.role!=='superadmin'&&<button className="text-cyan-700" onClick={()=>change(u,'role',u.role==='admin'?'user':'admin')}>{u.role==='admin'?'Demote':'Promote'}</button>} {u.role!=='superadmin'&&<button className="text-rose-600" onClick={()=>remove(u)}>Delete</button>}</td></tr>)}</tbody></table>{!rows.length&&<p className="p-10 text-center text-slate-500">No users found.</p>}</div>}</>}

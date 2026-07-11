@@ -4,8 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { signOut } from "firebase/auth";
 import {
   ChevronDown,
-  CircleHelp,
-  CreditCard,
+  LayoutDashboard,
   LogOut,
   ShieldCheck,
   Settings,
@@ -16,6 +15,8 @@ import { useEffect, useRef, useState } from "react";
 import UserAvatar from "@/components/common/UserAvatar";
 import { useAuth } from "@/src/context/AuthContext";
 import { auth } from "@/src/lib/firebase";
+import { canAccessAdmin } from "@/src/lib/access";
+import { getAdminUrl } from "@/src/lib/admin";
 
 type UserMenuProps = {
   displayName: string;
@@ -23,10 +24,9 @@ type UserMenuProps = {
 };
 
 const menuItems = [
-  { label: "My Profile", href: "/profile", icon: UserCircle },
+  { label: "Profile", href: "/profile", icon: UserCircle },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Settings", href: "/settings", icon: Settings },
-  { label: "Subscription / Billing", href: "/pricing", icon: CreditCard },
-  { label: "Help", href: "/ai-tutor", icon: CircleHelp },
 ];
 
 export default function UserMenu({ className = "", displayName }: UserMenuProps) {
@@ -34,7 +34,8 @@ export default function UserMenu({ className = "", displayName }: UserMenuProps)
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const isAdmin = userProfile?.role === "admin";
+  const isAdmin = canAccessAdmin(userProfile?.role);
+  const adminUrl = getAdminUrl();
 
   useEffect(() => {
     if (!open) {
@@ -147,6 +148,31 @@ export default function UserMenu({ className = "", displayName }: UserMenuProps)
                 {menuItems.map((item) => {
                   const Icon = item.icon;
 
+                  if (item.href === "/settings" && isAdmin) {
+                    return (
+                      <div key={item.href}>
+                        <a
+                          href={adminUrl}
+                          role="menuitem"
+                          onClick={closeMenu}
+                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-black transition hover:bg-gradient-to-r hover:from-[#008099] hover:via-[#0EA5B7] hover:to-[#7C4DFF] hover:text-white focus:bg-gradient-to-r focus:from-[#008099] focus:via-[#0EA5B7] focus:to-[#7C4DFF] focus:text-white focus:outline-none"
+                        >
+                          <ShieldCheck size={18} />
+                          Admin Dashboard
+                        </a>
+                        <Link
+                          href={item.href}
+                          role="menuitem"
+                          onClick={closeMenu}
+                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-black transition hover:bg-gradient-to-r hover:from-[#008099] hover:via-[#0EA5B7] hover:to-[#7C4DFF] hover:text-white focus:bg-gradient-to-r focus:from-[#008099] focus:via-[#0EA5B7] focus:to-[#7C4DFF] focus:text-white focus:outline-none"
+                        >
+                          <Icon size={18} />
+                          {item.label}
+                        </Link>
+                      </div>
+                    );
+                  }
+
                   return (
                     <Link
                       key={item.href}
@@ -160,17 +186,6 @@ export default function UserMenu({ className = "", displayName }: UserMenuProps)
                     </Link>
                   );
                 })}
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    role="menuitem"
-                    onClick={closeMenu}
-                    className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-black transition hover:bg-gradient-to-r hover:from-[#008099] hover:via-[#0EA5B7] hover:to-[#7C4DFF] hover:text-white focus:bg-gradient-to-r focus:from-[#008099] focus:via-[#0EA5B7] focus:to-[#7C4DFF] focus:text-white focus:outline-none"
-                  >
-                    <ShieldCheck size={18} />
-                    Admin
-                  </Link>
-                )}
               </div>
 
               <div className="border-t border-slate-200/70 pt-2 dark:border-white/10">

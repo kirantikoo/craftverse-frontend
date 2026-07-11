@@ -21,25 +21,15 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import UserAvatar from "@/components/common/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/src/context/AuthContext";
+import { getPlanLabel, isStaff, isTrialUser } from "@/src/lib/access";
 import { getDaysLeft } from "@/src/lib/subscription";
+import { tutorials } from "@/src/data/tutorials";
+import { normalizeInterest, recommendedTutorials, goalLabels, type PersonalizedTutorial } from "@/src/lib/personalization";
 
 const progressStats = [
   { label: "Current Plan", value: "Trial", icon: Crown },
-  { label: "Trial Days Remaining", value: "12", icon: Sparkles },
   { label: "Current XP", value: "650", icon: Star },
   { label: "Current Streak", value: "5 days", icon: Flame },
-];
-
-const recentTutorials = [
-  "Easy Tote Bag",
-  "Crochet Flower",
-  "Paper Butterfly",
-];
-
-const achievements = [
-  "First Project Shared",
-  "3-Day Learning Streak",
-  "Sewing Basics Started",
 ];
 
 function GlassCard({
@@ -68,19 +58,30 @@ function SectionLabel({ icon: Icon, children }: { icon: LucideIcon; children: Re
 function DashboardContent() {
   const { displayName, profileError, user, userProfile } = useAuth();
   const daysLeft = getDaysLeft(userProfile?.trialEndsAt);
-  const planLabel = userProfile?.plan === "premium" ? "Premium" : "Trial";
-  const shownDaysLeft = daysLeft || 12;
+  const planLabel = getPlanLabel(userProfile);
+  const showTrialCard = isTrialUser(userProfile);
+  const showTrialDays = showTrialCard && !isStaff(userProfile?.role);
+  const catalog: PersonalizedTutorial[] = tutorials.flatMap((tutorial) => {
+    const category = normalizeInterest(tutorial.category);
+    if (!category) return [];
+    return [{ id: tutorial.slug, slug: tutorial.slug, title: tutorial.title, description: tutorial.description, category, level: tutorial.difficulty.toLowerCase() === "intermediate" ? "intermediate" : "beginner", learningGoals: ["learn-basics"], tags: [category], published: true, featured: tutorial.slug === "sewing-machine-basics", durationMinutes: Number.parseInt(tutorial.timeRequired) || undefined }];
+  });
+  const preferences = { interests: userProfile?.interests || [], skillLevel: userProfile?.skillLevel, learningGoals: userProfile?.learningGoals || [] };
+  const recommendations = isStaff(userProfile?.role) ? catalog : recommendedTutorials(catalog, preferences);
+  const dailyChallenge = recommendations[0];
 
-  const stats = progressStats.map((stat) => {
-    if (stat.label === "Current Plan") {
-      return { ...stat, value: planLabel };
+  const stats = progressStats.flatMap((stat) => {
+    const normalizedStat =
+      stat.label === "Current Plan" ? { ...stat, value: planLabel } : stat;
+
+    if (stat.label !== "Current Plan" || !showTrialDays) {
+      return [normalizedStat];
     }
 
-    if (stat.label === "Trial Days Remaining") {
-      return { ...stat, value: String(shownDaysLeft) };
-    }
-
-    return stat;
+    return [
+      normalizedStat,
+      { label: "Trial Days Remaining", value: String(daysLeft), icon: Sparkles },
+    ];
   });
 
   return (
@@ -92,7 +93,7 @@ function DashboardContent() {
           </p>
         ) : null}
 
-        <div className="grid gap-6 xl:grid-cols-[1.55fr_0.85fr]">
+        <div className={`grid gap-6 ${showTrialCard ? "xl:grid-cols-[1.55fr_0.85fr]" : ""}`}>
           <GlassCard className="overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(78,254,50,0.10),rgba(124,77,255,0.12))] dark:bg-[linear-gradient(135deg,rgba(17,24,39,0.92),rgba(0,128,153,0.16),rgba(124,77,255,0.18))]">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
               <UserAvatar
@@ -131,66 +132,66 @@ function DashboardContent() {
             </div>
           </GlassCard>
 
-          <GlassCard className="bg-[linear-gradient(135deg,rgba(78,254,50,0.18),rgba(255,255,255,0.84),rgba(124,77,255,0.14))] dark:bg-[linear-gradient(135deg,rgba(78,254,50,0.12),rgba(17,24,39,0.9),rgba(124,77,255,0.18))]">
-            <SectionLabel icon={Crown}>Premium Trial</SectionLabel>
-            <h2 className="mt-5 text-2xl font-black">15-Day Free Trial</h2>
-            <p className="mt-2 text-sm font-bold text-slate-600 dark:text-[#94A3B8]">
-              {shownDaysLeft} {shownDaysLeft === 1 ? "day" : "days"} remaining
-            </p>
-          </GlassCard>
+          {showTrialCard ? (
+            <GlassCard className="bg-[linear-gradient(135deg,rgba(78,254,50,0.18),rgba(255,255,255,0.84),rgba(124,77,255,0.14))] dark:bg-[linear-gradient(135deg,rgba(78,254,50,0.12),rgba(17,24,39,0.9),rgba(124,77,255,0.18))]">
+              <SectionLabel icon={Crown}>Premium Trial</SectionLabel>
+              <h2 className="mt-5 text-2xl font-black">15-Day Free Trial</h2>
+              <p className="mt-2 text-sm font-bold text-slate-600 dark:text-[#94A3B8]">
+                {daysLeft} {daysLeft === 1 ? "day" : "days"} remaining
+              </p>
+            </GlassCard>
+          ) : null}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <GlassCard>
             <SectionLabel icon={PlayCircle}>Continue Learning</SectionLabel>
-            <h2 className="mt-5 text-2xl font-black">Easy Tote Bag</h2>
+            <h2 className="mt-5 text-2xl font-black">No active lesson yet</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-[#94A3B8]">
-              Pick up at attaching handles and finishing the side seams.
+              Start a recommended tutorial and your saved progress will appear here.
             </p>
-            <div className="mt-6 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-              <div className="h-full w-[65%] rounded-full bg-gradient-to-r from-[#008099] to-[#4EFE32]" />
-            </div>
             <Button asChild className="mt-6 h-11 rounded-2xl bg-[#008099] px-5 font-black text-white hover:bg-[#006f85]">
-              <Link href="/tutorials/easy-tote-bag">Continue Learning</Link>
+              <Link href="/learn">Find a lesson</Link>
             </Button>
           </GlassCard>
 
           <GlassCard>
             <SectionLabel icon={Target}>Daily Challenge</SectionLabel>
-            <h2 className="mt-5 text-2xl font-black">Make a Paper Butterfly</h2>
+            <h2 className="mt-5 text-2xl font-black">{dailyChallenge?.title || "No challenge available"}</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-[#94A3B8]">
-              A quick creative warmup with a focused XP reward.
+              {dailyChallenge?.description || "Update your preferences to help us find a challenge in your crafts."}
             </p>
             <div className="mt-6 flex items-center gap-3 rounded-3xl bg-[#4EFE32]/12 p-4 text-sm font-bold text-emerald-700 dark:text-[#4EFE32]">
               <Trophy size={19} />
               Reward: +25 XP
             </div>
             <Button asChild className="mt-6 h-11 rounded-2xl bg-[#7C4DFF] px-5 font-black text-white hover:bg-[#6b3df0]">
-              <Link href="/tutorials/paper-butterfly">Start Challenge</Link>
+              <Link href={dailyChallenge?.slug?`/tutorials/${dailyChallenge.slug}`:"/settings/preferences"}>{dailyChallenge?"Start Challenge":"Update preferences"}</Link>
             </Button>
           </GlassCard>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <GlassCard>
-            <SectionLabel icon={BookOpen}>Recent Tutorials</SectionLabel>
+            <SectionLabel icon={BookOpen}>Recommended For You</SectionLabel>
             <div className="mt-5 space-y-3">
-              {recentTutorials.map((tutorial) => (
-                <div key={tutorial} className="flex items-center justify-between rounded-3xl bg-white/65 p-4 dark:bg-white/[0.06]">
-                  <span className="font-black">{tutorial}</span>
+              {recommendations.map((tutorial) => (
+                <Link href={`/tutorials/${tutorial.slug}`} key={tutorial.id} className="flex items-center justify-between rounded-3xl bg-white/65 p-4 dark:bg-white/[0.06]">
+                  <span className="font-black">{tutorial.title}</span>
                   <ArrowRight size={17} className="text-slate-400" />
-                </div>
+                </Link>
               ))}
+              {!recommendations.length?<div className="rounded-3xl bg-white/65 p-5 dark:bg-white/[0.06]"><p>No exact tutorials match yet.</p><Link className="mt-3 inline-block font-black text-cyan-700" href="/settings/preferences">Update preferences</Link></div>:null}
             </div>
           </GlassCard>
 
           <GlassCard>
-            <SectionLabel icon={Medal}>Achievements</SectionLabel>
+            <SectionLabel icon={Medal}>Your Craft Goals</SectionLabel>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {achievements.map((achievement) => (
-                <div key={achievement} className="rounded-3xl bg-gradient-to-br from-[#008099]/12 to-[#7C4DFF]/12 p-4">
+              {(userProfile?.learningGoals||[]).map((goal) => (
+                <div key={goal} className="rounded-3xl bg-gradient-to-br from-[#008099]/12 to-[#7C4DFF]/12 p-4">
                   <Medal size={20} className="text-[#7C4DFF] dark:text-violet-200" />
-                  <p className="mt-4 text-sm font-black">{achievement}</p>
+                  <p className="mt-4 text-sm font-black">{goalLabels[goal]}</p>
                 </div>
               ))}
             </div>

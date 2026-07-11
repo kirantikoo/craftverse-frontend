@@ -1,0 +1,14 @@
+export const craftInterests = ["crochet","knitting","sewing","embroidery","paper-craft","jewelry-making","macrame","painting","kids-crafts","home-decor","upcycling","resin-art"] as const;
+export type CraftInterest = typeof craftInterests[number];
+export const learningGoals = ["learn-basics","make-gifts","sell-handmade-products","create-home-decor","teach-kids","start-craft-business"] as const;
+export type LearningGoal = typeof learningGoals[number];
+export type SkillLevel = "beginner"|"intermediate"|"advanced";
+export const interestLabels: Record<CraftInterest,string>={crochet:"Crochet",knitting:"Knitting",sewing:"Sewing",embroidery:"Embroidery","paper-craft":"Paper craft","jewelry-making":"Jewelry making",macrame:"Macramé",painting:"Painting","kids-crafts":"Kids crafts","home-decor":"Home décor",upcycling:"Upcycling","resin-art":"Resin art"};
+export const goalLabels: Record<LearningGoal,string>={"learn-basics":"Learn basics","make-gifts":"Make gifts","sell-handmade-products":"Sell handmade products","create-home-decor":"Create home décor","teach-kids":"Teach kids","start-craft-business":"Start a craft business"};
+export type PersonalizedTutorial={id:string;title:string;description:string;category:CraftInterest;level:SkillLevel;learningGoals?:LearningGoal[];tags:string[];published:boolean;featured?:boolean;imageUrl?:string;videoUrl?:string;durationMinutes?:number;slug?:string;popularity?:number};
+export type Preferences={interests:CraftInterest[];skillLevel?:SkillLevel;learningGoals:LearningGoal[]};
+const categoryAliases:Record<string,CraftInterest>={diy:"paper-craft",paper:"paper-craft",sewing:"sewing",crochet:"crochet",knitting:"knitting",embroidery:"embroidery",painting:"painting"};
+export function normalizeInterest(value:unknown):CraftInterest|undefined{if(typeof value!=="string")return;const slug=value.trim().toLowerCase().replace(/\s+/g,"-");return craftInterests.includes(slug as CraftInterest)?slug as CraftInterest:categoryAliases[slug]}
+export function scoreTutorial(t:PersonalizedTutorial,p:Preferences){let score=0;if(p.interests.includes(t.category))score+=50;if(p.skillLevel===t.level)score+=30;score+=(t.learningGoals||[]).filter(g=>p.learningGoals.includes(g)).length*15;if(t.featured)score+=5;return score}
+export function recommendedTutorials(items:PersonalizedTutorial[],p:Preferences,limit=6){const unique=new Map(items.filter(t=>t.published&&p.interests.includes(t.category)).map(t=>[t.id,t]));return [...unique.values()].sort((a,b)=>scoreTutorial(b,p)-scoreTutorial(a,p)||(b.popularity||0)-(a.popularity||0)).slice(0,limit)}
+export function relatedTutorials(items:PersonalizedTutorial[],current:PersonalizedTutorial,p:Preferences,limit=4){return recommendedTutorials(items.filter(t=>t.id!==current.id&&(t.category===current.category||t.tags.some(tag=>current.tags.includes(tag)))),p,limit)}
