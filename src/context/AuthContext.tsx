@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import {
   createContext,
   useContext,
@@ -16,9 +15,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { auth, db, googleProvider } from "@/src/lib/firebase";
-import { SUPERADMIN_EMAIL, type AppPlan, type AppRole } from "@/src/lib/access";
-import { getTrialEndDate } from "@/src/lib/subscription";
+import { auth, googleProvider } from "@/src/lib/firebase";
+import { type AppPlan, type AppRole } from "@/src/lib/access";
 import { getUserDisplayName } from "@/src/lib/user";
 import type { CraftInterest, LearningGoal, SkillLevel } from "@/src/lib/personalization";
 
@@ -33,7 +31,9 @@ export type UserProfile = {
   plan?: AppPlan;
   trialStartedAt?: Date | string | number | { toDate: () => Date };
   trialEndsAt?: Date | string | number | { toDate: () => Date };
-  subscriptionStatus: "trial" | "active" | "expired" | "canceled";
+  trialStartDate?: Date | string | number | { toDate: () => Date };
+  trialEndDate?: Date | string | number | { toDate: () => Date };
+  subscriptionStatus: "trial" | "premium" | "active" | "expired" | "canceled";
   createdAt?: Date | string | number | { toDate: () => Date };
   updatedAt?: Date | string | number | { toDate: () => Date };
   interests: CraftInterest[];
@@ -100,13 +100,9 @@ function getProfileErrorMessage(error: unknown) {
   return PROFILE_ERROR_MESSAGE;
 }
 
-function normalizeRole(role: unknown, email: string | null | undefined): AppRole {
+function normalizeRole(role: unknown): AppRole {
   if (role === "admin" || role === "superadmin" || role === "user") {
     return role;
-  }
-
-  if (!role && email?.toLowerCase() === SUPERADMIN_EMAIL) {
-    return "superadmin";
   }
 
   return "user";
@@ -161,13 +157,10 @@ async function getApiErrorMessage(response: Response) {
 function normalizeUserProfile(user: User, profile: Partial<UserProfile> = {}): UserProfile {
   const name = profile.name?.trim() || profile.displayName?.trim() || getUserDisplayName(user);
   const email = profile.email ?? user.email;
-  const role = normalizeRole(
-    typeof profile.role === "string" ? profile.role.toLowerCase() : profile.role,
-    email,
-  );
+  const role = normalizeRole(typeof profile.role === "string" ? profile.role.toLowerCase() : profile.role);
   const plan = normalizePlan(profile.plan);
-  const trialStartedAt = profile.trialStartedAt ?? new Date();
-  const trialEndsAt = profile.trialEndsAt ?? getTrialEndDate(new Date());
+  const trialStartedAt = profile.trialStartedAt ?? profile.trialStartDate;
+  const trialEndsAt = profile.trialEndsAt ?? profile.trialEndDate;
 
   return {
     ...profile,
@@ -206,98 +199,29 @@ function unwrapProfileResponse(responseBody: unknown) {
   return body.profile ?? body.user ?? body.data?.profile ?? body.data?.user ?? body.data ?? (responseBody as Partial<UserProfile>);
 }
 
-async function syncUserProfileWithApi(user: User) {
+async function fetchBackendProfile(user: User) {
   const token = await user.getIdToken();
+  const headers = { Authorization: `Bearer ${token}` };
+  const syncResponse = await fetch(`${getApiUrl()}/api/auth/sync-user`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
 
-  try {
-    const response = await fetch(`${getApiUrl()}/api/auth/sync-user`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: user.displayName || "",
-        email: user.email || "",
-        photoURL: user.photoURL || "",
-        country: detectCountry(),
-        role: "user",
-        plan: "trial",
-        trialLengthDays: 15,
-        interests: [],
-        learningGoals: [],
-        skillLevel: null,
-        onboardingCompleted: false,
-      }),
-    });
-
-    if (!response.ok) {
-      console.warn("CraftVerse profile sync failed:", await getApiErrorMessage(response));
-      return null;
-    }
-
-    const responseBody = (await response.json()) as unknown;
-    return normalizeUserProfile(user, unwrapProfileResponse(responseBody));
-  } catch {
-    console.warn("CraftVerse API is not reachable. Using your saved profile if available.");
-    return null;
-  }
-}
-
-async function getFirestoreUserProfile(user: User) {
-  const userRef = doc(db, "users", user.uid);
-  const userSnapshot = await getDoc(userRef);
-
-  if (!userSnapshot.exists()) {
-    const newProfile = {
-      uid: user.uid,
-      email: user.email ?? null,
-      displayName: user.displayName ?? "",
-      photoURL: user.photoURL ?? null,
-      role: "user" as const,
-      plan: "trial" as const,
-      interests: [] as CraftInterest[],
-      skillLevel: null,
-      learningGoals: [] as LearningGoal[],
-      onboardingCompleted: false,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
-
-    await setDoc(userRef, newProfile);
-    return normalizeUserProfile(user, {
-      uid: newProfile.uid,
-      email: newProfile.email,
-      displayName: newProfile.displayName,
-      photoURL: newProfile.photoURL,
-      role: newProfile.role,
-      plan: newProfile.plan,
-      interests: newProfile.interests,
-      learningGoals: newProfile.learningGoals,
-      onboardingCompleted: newProfile.onboardingCompleted,
-    });
+  if (!syncResponse.ok) {
+    throw new Error(await getApiErrorMessage(syncResponse));
   }
 
-  return normalizeUserProfile(user, userSnapshot.data() as Partial<UserProfile>);
+  const profileResponse = await fetch(`${getApiUrl()}/api/users/me`, { headers });
+  if (!profileResponse.ok) {
+    throw new Error(await getApiErrorMessage(profileResponse));
+  }
+
+  return normalizeUserProfile(user, unwrapProfileResponse(await profileResponse.json()));
 }
 
 export async function ensureUserProfile(user: User) {
-  try {
-    const firestoreProfile = await getFirestoreUserProfile(user);
-    if (firestoreProfile) {
-      return firestoreProfile;
-    }
-  } catch {
-    console.warn("Saved CraftVerse profile is not available. Using Firebase account details.");
-  }
-
-  const syncedProfile = await syncUserProfileWithApi(user);
-
-  if (syncedProfile) {
-    return syncedProfile;
-  }
-
-  return normalizeUserProfile(user);
+  return fetchBackendProfile(user);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

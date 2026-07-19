@@ -4,8 +4,6 @@ import { isTrialActive } from "@/src/lib/subscription";
 export type AppRole = "user" | "admin" | "superadmin";
 export type AppPlan = "trial" | "free" | "premium";
 
-export const SUPERADMIN_EMAIL = "kirantikoo@gmail.com";
-
 export const isStaff = (role?: AppRole) =>
   role === "admin" || role === "superadmin";
 

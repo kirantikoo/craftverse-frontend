@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, create, delete: if false;
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'displayName', 'photoURL', 'country', 'interests',
+          'learningGoals', 'skillLevel', 'onboardingCompleted', 'updatedAt'
+        ]);
+    }
+
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
+
+    // No runtime code uses this legacy collection. Keep it closed.
+    match /profiles/{uid} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
